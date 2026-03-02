@@ -15,14 +15,14 @@ interface LanguageContextProps {
 
 const LanguageContext = createContext<LanguageContextProps | undefined>(undefined);
 
-export const LanguageProvider: FC<{ children: ReactNode }> = ({ children }) => {
+export const LanguageProvider: FC<{ children: ReactNode }> = function LanguageProvider({ children }) {
   const [lang, setLang] = useState<Language>("en");
 
   useEffect(() => {
     const savedLang = localStorage.getItem("lang") as Language | null;
     if (savedLang && (savedLang === "en" || savedLang === "zh")) {
       // eslint-disable-next-line react-hooks/set-state-in-effect
-    setLang(savedLang);
+      setLang(savedLang);
     } else if (navigator.language.startsWith("zh")) {
       setLang("zh");
     }
