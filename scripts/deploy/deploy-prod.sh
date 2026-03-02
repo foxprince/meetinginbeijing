@@ -40,20 +40,22 @@ else
 fi
 git push origin "$BRANCH"
 
-$REMOTE_SSH <<EOF
+echo "开始远程部署..."
+$REMOTE_SSH "bash -s" "$BRANCH" "$REMOTE_SERVICE_NAME" "$REMOTE_PORT" "$REMOTE_DOMAIN" "$REMOTE_REPO_DIR" "$REMOTE_USER" "$REMOTE_GROUP" <<'EOF'
+
 set -euo pipefail
 
-BRANCH="$BRANCH"
-SERVICE_NAME="$REMOTE_SERVICE_NAME"
-PORT="$REMOTE_PORT"
-DOMAIN="$REMOTE_DOMAIN"
-APP_DIR="$REMOTE_REPO_DIR"
-APP_USER="$REMOTE_USER"
-APP_GROUP="$REMOTE_GROUP"
+BRANCH="$1"
+SERVICE_NAME="$2"
+PORT="$3"
+DOMAIN="$4"
+APP_DIR="$5"
+APP_USER="$6"
+APP_GROUP="$7"
 NODE_ENV=production
 PNPM_HOME=/home/app/.local/share/pnpm
 export PNPM_HOME
-export PATH="\$PNPM_HOME:\$PATH"
+export PATH="$PNPM_HOME:$PATH"
 
 if ! command -v pnpm >/dev/null 2>&1; then
   echo "pnpm 不存在，将尝试使用 corepack 安装"
@@ -148,6 +150,7 @@ fi
 
 sudo nginx -t
 sudo systemctl reload nginx
+echo "远程部署完成。"
 EOF
 
 echo "部署流程结束。"
