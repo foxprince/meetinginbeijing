@@ -6,27 +6,39 @@ if (!connectionString) {
   throw new Error('POSTGRES_URL is not set');
 }
 
-// 解析连接字符串，正确处理 URL 编码的密码
-try {
-  const url = new URL(connectionString);
-  // 确保密码被正确解码
-  if (url.password) {
-    url.password = decodeURIComponent(url.password);
-  }
-  connectionString = url.toString();
-} catch (error) {
-  console.warn('Failed to parse connection string as URL, using as-is');
-}
-
 // 允许自签名证书连接数据库
 process.env.NODE_TLS_REJECT_UNAUTHORIZED = '0';
 
-const pool = new Pool({
+// 解析连接字符串，正确处理 URL 编码的密码
+let poolConfig: any = {
   connectionString,
   ssl: {
     rejectUnauthorized: false,
   },
-});
+};
+
+try {
+  const url = new URL(connectionString);
+  // 如果密码包含 URL 编码字符，需要解码
+  if (url.password && url.password.includes('%')) {
+    const decodedPassword = decodeURIComponent(url.password);
+    // 使用分离的配置而不是连接字符串，避免 pg 库的 URL 解析问题
+    poolConfig = {
+      host: url.hostname,
+      port: parseInt(url.port || '5432'),
+      database: url.pathname.slice(1),
+      user: url.username,
+      password: decodedPassword,
+      ssl: {
+        rejectUnauthorized: false,
+      },
+    };
+  }
+} catch (error) {
+  console.warn('Failed to parse connection string, using as-is');
+}
+
+const pool = new Pool(poolConfig);
 
 export const getDbPool = () => pool;
 
