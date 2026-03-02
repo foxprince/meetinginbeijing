@@ -15,7 +15,7 @@ interface LanguageContextProps {
 
 const LanguageContext = createContext<LanguageContextProps | undefined>(undefined);
 
-export function LanguageProvider({ children }: { children: ReactNode }) {
+export function LanguageProvider({ children }: { children: ReactNode }): React.JSX.Element {
   const [lang, setLang] = useState<Language>("en");
 
   useEffect(() => {
