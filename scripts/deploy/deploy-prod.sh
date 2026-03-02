@@ -82,6 +82,9 @@ POSTGRES_URL=postgresql://localhost/dummy
 ADMIN_SESSION_TOKEN=dummy-token
 S3_BUCKET_NAME=dummy-bucket
 S3_PUBLIC_BASE_URL=https://dummy.example.com
+S3_REGION=us-east-1
+S3_ACCESS_KEY_ID=dummy-key
+S3_SECRET_ACCESS_KEY=dummy-secret
 ENVFILE
 
 pnpm build
