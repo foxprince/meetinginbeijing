@@ -1,9 +1,17 @@
 import { Pool } from 'pg';
 
-const connectionString = process.env.POSTGRES_URL;
+let connectionString = process.env.POSTGRES_URL;
 
 if (!connectionString) {
   throw new Error('POSTGRES_URL is not set');
+}
+
+// 解码连接字符串中的 URL 编码字符（如 %26 -> &）
+try {
+  const url = new URL(connectionString);
+  connectionString = url.toString();
+} catch (error) {
+  console.warn('Failed to parse connection string as URL, using as-is');
 }
 
 // 允许自签名证书连接数据库
