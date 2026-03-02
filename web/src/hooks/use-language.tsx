@@ -13,7 +13,7 @@ interface LanguageContextProps {
   t: ContentMap[Language];
 }
 
-const LanguageContext = createContext<LanguageContextProps | undefined>(undefined);
+export const LanguageContext = createContext<LanguageContextProps | undefined>(undefined);
 
 export function LanguageProvider({ children }: { children: ReactNode }): React.JSX.Element {
   const [lang, setLang] = useState<Language>("en");
@@ -36,12 +36,12 @@ export function LanguageProvider({ children }: { children: ReactNode }): React.J
 
   const t = content[lang];
 
-  return (
-    <LanguageContext.Provider value={{ lang, toggleLanguage, t }}>
-      {children}
-    </LanguageContext.Provider>
+  return React.createElement(
+    LanguageContext.Provider,
+    { value: { lang, toggleLanguage, t } },
+    children
   );
-};
+}
 
 export const useLanguage = () => {
   const context = useContext(LanguageContext);
