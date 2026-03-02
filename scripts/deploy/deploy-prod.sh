@@ -67,10 +67,14 @@ if ! command -v pnpm >/dev/null 2>&1; then
 fi
 
 cd "$APP_DIR"
-git remote set-url origin git@gitee.com:foxprince/meetinginbeijing.git || true
-git fetch --all --prune
-git checkout "$BRANCH"
-git pull --ff-only origin "$BRANCH"
+git checkout "$BRANCH" 2>/dev/null || true
+CURRENT_BRANCH=$(git rev-parse --abbrev-ref HEAD)
+if [ "$CURRENT_BRANCH" != "$BRANCH" ]; then
+  echo "当前分支不是 $BRANCH，尝试切换..."
+  git branch -f "$BRANCH" origin/"$BRANCH" 2>/dev/null || true
+  git checkout "$BRANCH"
+fi
+echo "跳过 git pull（使用本地已有代码）"
 
 cd web
 pnpm install --frozen-lockfile
