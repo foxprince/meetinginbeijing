@@ -66,16 +66,11 @@ if ! command -v pnpm >/dev/null 2>&1; then
   fi
 fi
 
-if [ ! -d "$APP_DIR/web" ]; then
-  echo "工作目录不存在，重新初始化..."
-  cd "$APP_DIR"
-  git config --bool core.bare false
-  git reset --hard HEAD
-  git checkout "$BRANCH"
-else
-  cd "$APP_DIR"
-  git checkout "$BRANCH" 2>/dev/null || true
-fi
+cd "$APP_DIR"
+git remote set-url origin git@gitee.com:foxprince/meetinginbeijing.git 2>/dev/null || true
+git fetch origin "$BRANCH"
+git checkout "$BRANCH"
+git reset --hard origin/"$BRANCH"
 
 cd "$APP_DIR/web"
 pnpm install --frozen-lockfile
