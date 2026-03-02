@@ -6,9 +6,13 @@ if (!connectionString) {
   throw new Error('POSTGRES_URL is not set');
 }
 
-// 解码连接字符串中的 URL 编码字符（如 %26 -> &）
+// 解析连接字符串，正确处理 URL 编码的密码
 try {
   const url = new URL(connectionString);
+  // 确保密码被正确解码
+  if (url.password) {
+    url.password = decodeURIComponent(url.password);
+  }
   connectionString = url.toString();
 } catch (error) {
   console.warn('Failed to parse connection string as URL, using as-is');
