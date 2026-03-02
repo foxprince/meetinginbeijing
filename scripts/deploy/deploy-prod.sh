@@ -67,6 +67,7 @@ if ! command -v pnpm >/dev/null 2>&1; then
 fi
 
 cd "$APP_DIR"
+git remote set-url origin git@gitee.com:foxprince/meetinginbeijing.git || true
 git fetch --all --prune
 git checkout "$BRANCH"
 git pull --ff-only origin "$BRANCH"
