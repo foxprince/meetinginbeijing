@@ -129,7 +129,10 @@ sudo systemctl restart ${SERVICE_NAME}.service
 
 NGINX_CONF=/etc/nginx/sites-available/meetinginbeijing.conf
 if [ ! -f "$NGINX_CONF" ]; then
-  sudo tee "$NGINX_CONF" >/dev/null <<NGINX
+  # Check if SSL certificate exists
+  if [ -f "/etc/letsencrypt/live/${DOMAIN}/fullchain.pem" ]; then
+    # SSL certificate exists, use full HTTPS config
+    sudo tee "$NGINX_CONF" >/dev/null <<NGINX
 server {
     listen 80;
     server_name ${DOMAIN};
@@ -163,13 +166,38 @@ server {
     }
 }
 NGINX
+  else
+    # SSL certificate doesn't exist, use HTTP only config
+    sudo tee "$NGINX_CONF" >/dev/null <<NGINX
+server {
+    listen 80;
+    server_name ${DOMAIN};
+
+    location / {
+        proxy_pass http://127.0.0.1:${PORT};
+        proxy_http_version 1.1;
+        proxy_set_header Upgrade \$http_upgrade;
+        proxy_set_header Connection "upgrade";
+        proxy_set_header Host \$host;
+        proxy_set_header X-Real-IP \$remote_addr;
+        proxy_set_header X-Forwarded-For \$proxy_add_x_forwarded_for;
+        proxy_set_header X-Forwarded-Proto \$scheme;
+        proxy_set_header X-Forwarded-Host \$host;
+        proxy_set_header X-Forwarded-Port \$server_port;
+    }
+
+    location /.well-known/acme-challenge/ {
+        root /var/www/certbot;
+    }
+}
+NGINX
+  fi
   sudo ln -sf "$NGINX_CONF" /etc/nginx/sites-enabled/meetinginbeijing.conf
 else
   echo "Nginx 配置已存在，跳过写入 $NGINX_CONF"
 fi
 
-sudo nginx -t
-sudo systemctl reload nginx
+sudo nginx -t && sudo systemctl reload nginx || echo "Nginx 配置测试失败，请检查证书是否存在"
 echo "远程部署完成。"
 EOF
 
