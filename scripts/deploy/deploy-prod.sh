@@ -26,12 +26,6 @@ fi
 
 echo "将要提交以下改动："
 git status --short
-read -r -p "以上改动将以 '$COMMIT_MESSAGE' 提交并推送到 $BRANCH, 确定继续？[y/N] " CONFIRM
-CONFIRM=${CONFIRM:-n}
-if [[ ! $CONFIRM =~ ^[Yy]$ ]]; then
-  echo "已取消。"
-  exit 1
-fi
 
 git add -A
 if git diff --cached --quiet; then
@@ -80,20 +74,10 @@ pnpm install --no-frozen-lockfile
 # Force remove old use-language.ts file if it exists
 rm -f src/hooks/use-language.ts
 
-# Create .env.local with dummy values for build
-cat > .env.local <<ENVFILE
-POSTGRES_URL=postgresql://localhost/dummy
-ADMIN_SESSION_TOKEN=dummy-token
-S3_BUCKET_NAME=dummy-bucket
-S3_PUBLIC_BASE_URL=https://dummy.example.com
-S3_REGION=us-east-1
-S3_ACCESS_KEY_ID=dummy-key
-S3_SECRET_ACCESS_KEY=dummy-secret
-ENVFILE
-
 # Clean build cache
 rm -rf .next .turbo node_modules/.cache
 
+# Build with real environment variables from .env
 pnpm build
 
 SERVICE_FILE=/etc/systemd/system/${SERVICE_NAME}.service
