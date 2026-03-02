@@ -14,6 +14,8 @@ if (!S3_BUCKET_NAME || !S3_PUBLIC_BASE_URL) {
   throw new Error("S3_BUCKET_NAME and S3_PUBLIC_BASE_URL must be configured");
 }
 
+const publicBaseUrl = S3_PUBLIC_BASE_URL;
+
 function buildObjectKey(filename?: string | null) {
   const safeName = filename || "upload";
   const ext = path.extname(safeName);
@@ -49,7 +51,7 @@ export async function POST(request: NextRequest) {
       })
     );
 
-    const fileUrl = `${S3_PUBLIC_BASE_URL.replace(/\/$/, "")}/${key}`;
+    const fileUrl = `${publicBaseUrl.replace(/\/$/, "")}/${key}`;
 
     return NextResponse.json({ url: fileUrl, key });
   } catch (error) {
