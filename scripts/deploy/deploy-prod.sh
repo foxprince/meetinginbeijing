@@ -76,11 +76,13 @@ cd "$APP_DIR/web"
 pnpm config set registry https://registry.npmmirror.com
 pnpm install --no-frozen-lockfile
 
-# Set dummy environment variables for build if not already set
-export POSTGRES_URL="${POSTGRES_URL:-postgresql://localhost/dummy}"
-export ADMIN_SESSION_TOKEN="${ADMIN_SESSION_TOKEN:-dummy-token}"
-export S3_BUCKET_NAME="${S3_BUCKET_NAME:-dummy-bucket}"
-export S3_PUBLIC_BASE_URL="${S3_PUBLIC_BASE_URL:-https://dummy.example.com}"
+# Create .env.local with dummy values for build
+cat > .env.local <<ENVFILE
+POSTGRES_URL=postgresql://localhost/dummy
+ADMIN_SESSION_TOKEN=dummy-token
+S3_BUCKET_NAME=dummy-bucket
+S3_PUBLIC_BASE_URL=https://dummy.example.com
+ENVFILE
 
 pnpm build
 
