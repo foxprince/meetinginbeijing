@@ -26,7 +26,8 @@ fi
 
 echo "将要提交以下改动："
 git status --short
-read -r -p "以上改动将以 '$COMMIT_MESSAGE' 提交并推送到 $BRANCH，确定继续？[y/N] " CONFIRM
+read -r -p "以上改动将以 '$COMMIT_MESSAGE' 提交并推送到 $BRANCH, 确定继续？[y/N] " CONFIRM
+CONFIRM=${CONFIRM:-n}
 if [[ ! $CONFIRM =~ ^[Yy]$ ]]; then
   echo "已取消。"
   exit 1
