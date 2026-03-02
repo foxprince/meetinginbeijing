@@ -51,9 +51,9 @@ APP_DIR="$REMOTE_REPO_DIR"
 APP_USER="$REMOTE_USER"
 APP_GROUP="$REMOTE_GROUP"
 NODE_ENV=production
-PNPM_HOME=${PNPM_HOME:-/home/app/.local/share/pnpm}
+PNPM_HOME=/home/app/.local/share/pnpm
 export PNPM_HOME
-export PATH="$PNPM_HOME:$PATH"
+export PATH="\$PNPM_HOME:\$PATH"
 
 if ! command -v pnpm >/dev/null 2>&1; then
   echo "pnpm 不存在，将尝试使用 corepack 安装"
