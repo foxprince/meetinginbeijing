@@ -76,6 +76,9 @@ cd "$APP_DIR/web"
 pnpm config set registry https://registry.npmmirror.com
 pnpm install --no-frozen-lockfile
 
+# Force remove old use-language.ts file if it exists
+rm -f src/hooks/use-language.ts
+
 # Create .env.local with dummy values for build
 cat > .env.local <<ENVFILE
 POSTGRES_URL=postgresql://localhost/dummy
@@ -86,6 +89,9 @@ S3_REGION=us-east-1
 S3_ACCESS_KEY_ID=dummy-key
 S3_SECRET_ACCESS_KEY=dummy-secret
 ENVFILE
+
+# Clean build cache
+rm -rf .next .turbo node_modules/.cache
 
 pnpm build
 
