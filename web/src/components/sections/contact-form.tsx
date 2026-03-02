@@ -1,7 +1,7 @@
 "use client";
 
 import React from "react";
-import { useLanguage } from "@/hooks/use-language";
+import { useLanguage } from "@/app/providers";
 import { SectionWrapper } from "@/components/section-wrapper";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";

@@ -2,7 +2,7 @@
 
 import React from "react";
 import Link from "next/link";
-import { useLanguage } from "@/hooks/use-language";
+import { useLanguage } from "@/app/providers";
 import { Button } from "@/components/ui/button";
 import { Globe } from "lucide-react";
 

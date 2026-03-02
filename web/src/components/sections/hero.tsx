@@ -1,7 +1,7 @@
 "use client";
 
 import React from "react";
-import { useLanguage } from "@/hooks/use-language";
+import { useLanguage } from "@/app/providers";
 import { Button } from "@/components/ui/button";
 import { CheckCircle2 } from "lucide-react";
 
