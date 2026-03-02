@@ -10,7 +10,7 @@ if [ $# -lt 1 ]; then
 fi
 
 COMMIT_MESSAGE="$1"
-BRANCH=${DEPLOY_BRANCH:-main}
+BRANCH=${DEPLOY_BRANCH:-master}
 REMOTE_SSH=${REMOTE_SSH_BIN:-$HOME/bin/toYDDECS}
 REMOTE_REPO_DIR=${REMOTE_REPO_DIR:-/home/app/git/meetinginbeijing}
 REMOTE_SERVICE_NAME=${REMOTE_SERVICE_NAME:-meetinginbeijing-web}
