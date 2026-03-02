@@ -156,7 +156,7 @@ async function fetchWpPosts(): Promise<WPPost[]> {
   return posts;
 }
 
-function getImageCandidate($img: cheerio.Cheerio): string | null {
+function getImageCandidate($img: cheerio.Cheerio<any>): string | null {
   const candidates = [
     $img.attr("data-src"),
     $img.attr("data-lazy-src"),
