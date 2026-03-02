@@ -74,7 +74,7 @@ git reset --hard origin/"$BRANCH"
 
 cd "$APP_DIR/web"
 pnpm config set registry https://registry.npmmirror.com
-pnpm install --frozen-lockfile
+pnpm install --no-frozen-lockfile
 pnpm build
 
 SERVICE_FILE=/etc/systemd/system/${SERVICE_NAME}.service
