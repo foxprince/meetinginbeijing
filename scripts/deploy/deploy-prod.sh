@@ -73,6 +73,7 @@ git checkout "$BRANCH"
 git reset --hard origin/"$BRANCH"
 
 cd "$APP_DIR/web"
+pnpm config set registry https://registry.npmmirror.com
 pnpm install --frozen-lockfile
 pnpm build
 
