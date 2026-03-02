@@ -1,4 +1,29 @@
 import { Pool } from 'pg';
+import * as fs from 'fs';
+import * as path from 'path';
+
+// 在生产环境中，从 .env 文件手动加载环境变量
+if (process.env.NODE_ENV === 'production' && !process.env.POSTGRES_URL) {
+  try {
+    const envPath = path.join(process.cwd(), '.env');
+    if (fs.existsSync(envPath)) {
+      const envContent = fs.readFileSync(envPath, 'utf-8');
+      const lines = envContent.split('\n');
+      for (const line of lines) {
+        const trimmed = line.trim();
+        if (trimmed && !trimmed.startsWith('#')) {
+          const [key, ...valueParts] = trimmed.split('=');
+          const value = valueParts.join('=');
+          if (key && value) {
+            process.env[key] = value;
+          }
+        }
+      }
+    }
+  } catch (error) {
+    console.warn('Failed to load .env file:', error);
+  }
+}
 
 let connectionString = process.env.POSTGRES_URL;
 
