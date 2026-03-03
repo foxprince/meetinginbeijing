@@ -18,6 +18,8 @@ const SECTION_LABELS: Record<CmsSectionKey, string> = {
   who_i_help: 'Who I Help 区块',
   services: 'Services 区块（服务项目）',
   how_it_works: 'How It Works 区块（工作流程）',
+  why_choose_me: 'Why Choose Me 区块（客户信任理由）',
+  testimonials: 'Testimonials 区块（客户反馈）',
   pricing: 'Pricing 区块',
 };
 

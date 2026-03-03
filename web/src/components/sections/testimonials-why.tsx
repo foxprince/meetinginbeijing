@@ -3,20 +3,46 @@
 import React from "react";
 import { useLanguage } from "@/app/providers";
 import { SectionWrapper } from "@/components/section-wrapper";
+import { useCmsSection } from "@/hooks/use-cms-section";
+import { EditableSection } from "@/components/cms/editable-section";
 import { CheckCircle2 } from "lucide-react";
 
 export function WhyChooseMe() {
-  const { t } = useLanguage();
+  const { lang, t } = useLanguage();
+  const cmsFallback = {
+    title: t.whyChooseMe.title,
+    items: t.whyChooseMe.items,
+  };
+  const [cmsContent, setCmsContent] = React.useState<Record<string, unknown>>(cmsFallback);
+  const fetchedContent = useCmsSection("why_choose_me", lang, cmsFallback);
+
+  React.useEffect(() => {
+    setCmsContent(fetchedContent);
+  }, [fetchedContent]);
+
+  const title = typeof cmsContent.title === "string" ? cmsContent.title : cmsFallback.title;
+  
+  const itemsRaw = cmsContent.items;
+  const items = Array.isArray(itemsRaw)
+    ? itemsRaw.filter((item): item is string => typeof item === "string")
+    : t.whyChooseMe.items;
 
   return (
     <SectionWrapper id="why-choose-me">
+      <EditableSection
+        sectionKey="why_choose_me"
+        locale={lang}
+        currentContent={cmsContent}
+        onSave={() => setCmsContent(fetchedContent)}
+        editLabel="编辑 Why Choose Me"
+      >
       <div className="grid grid-cols-1 md:grid-cols-2 gap-12 items-center">
         <div>
           <h2 className="text-3xl md:text-4xl font-bold text-slate-900 mb-8">
-            {t.whyChooseMe.title}
+            {title}
           </h2>
           <div className="space-y-6">
-            {t.whyChooseMe.items.map((item, index) => (
+            {items.map((item, index) => (
               <div key={index} className="flex items-start gap-4">
                 <div className="mt-1 bg-secondary p-1 rounded-full">
                   <CheckCircle2 className="h-5 w-5 text-primary" />
@@ -30,23 +56,50 @@ export function WhyChooseMe() {
           [ Professional Beijing Context Image ]
         </div>
       </div>
+      </EditableSection>
     </SectionWrapper>
   );
 }
 
 export function Testimonials() {
-  const { t } = useLanguage();
+  const { lang, t } = useLanguage();
+  const cmsFallback = {
+    title: t.testimonials.title,
+    items: t.testimonials.items,
+  };
+  const [cmsContent, setCmsContent] = React.useState<Record<string, unknown>>(cmsFallback);
+  const fetchedContent = useCmsSection("testimonials", lang, cmsFallback);
+
+  React.useEffect(() => {
+    setCmsContent(fetchedContent);
+  }, [fetchedContent]);
+
+  const title = typeof cmsContent.title === "string" ? cmsContent.title : cmsFallback.title;
+  
+  const itemsRaw = cmsContent.items;
+  const items = Array.isArray(itemsRaw)
+    ? itemsRaw.filter((item): item is { text: string; author: string; country: string } => 
+        typeof item === "object" && item !== null && "text" in item && "author" in item && "country" in item
+      )
+    : t.testimonials.items;
 
   return (
     <SectionWrapper id="testimonials" dark>
+      <EditableSection
+        sectionKey="testimonials"
+        locale={lang}
+        currentContent={cmsContent}
+        onSave={() => setCmsContent(fetchedContent)}
+        editLabel="编辑 Testimonials"
+      >
       <div className="text-center mb-16">
         <h2 className="text-3xl md:text-4xl font-bold text-slate-900 mb-4">
-          {t.testimonials.title}
+          {title}
         </h2>
       </div>
 
       <div className="grid grid-cols-1 md:grid-cols-2 gap-8 max-w-5xl mx-auto">
-        {t.testimonials.items.map((item, index) => (
+        {items.map((item, index) => (
           <div key={index} className="bg-white p-8 rounded-2xl shadow-sm border border-slate-100 relative">
             <div className="text-4xl text-secondary absolute top-4 left-4 font-serif">"</div>
             <p className="text-lg text-slate-700 italic mb-6 relative z-10 leading-relaxed">
@@ -64,6 +117,7 @@ export function Testimonials() {
           </div>
         ))}
       </div>
+      </EditableSection>
     </SectionWrapper>
   );
 }

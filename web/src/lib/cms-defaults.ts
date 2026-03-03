@@ -49,6 +49,20 @@ export function getDefaultCmsSectionContent(
     };
   }
 
+  if (sectionKey === 'why_choose_me') {
+    return {
+      title: langContent.whyChooseMe.title,
+      items: langContent.whyChooseMe.items,
+    };
+  }
+
+  if (sectionKey === 'testimonials') {
+    return {
+      title: langContent.testimonials.title,
+      items: langContent.testimonials.items,
+    };
+  }
+
   if (sectionKey === 'pricing') {
     return {
       title: langContent.pricing.title,

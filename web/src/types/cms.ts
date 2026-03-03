@@ -4,6 +4,8 @@ export const CMS_SECTION_KEYS = [
   'who_i_help',
   'services',
   'how_it_works',
+  'why_choose_me',
+  'testimonials',
   'pricing',
 ] as const;
 

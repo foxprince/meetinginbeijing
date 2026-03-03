@@ -65,6 +65,16 @@
 - 管理后台代码修改之后，只有明确要求才提交并重新部署
 - 后台api服务的代码修改之后需要重新部署
 
+### 生产服务器 Git 配置 ⚠️ **重要**
+- **必须设置正确的 remote URL**：在生产服务器上必须执行以下命令配置 Git remote
+  ```bash
+  cd /home/app/git/meetinginbeijing
+  git remote set-url origin git@gitee.com-jane:foxprince/meetinginbeijing.git
+  ```
+- **原因**：服务器配置了专用的 SSH key (`~/.ssh/id_ed25519_jane`)，通过 `~/.ssh/config` 中的 `Host gitee.com-jane` 别名来使用
+- **不要使用** `git@gitee.com:...`，会导致 DeployKey 认证失败
+- **验证配置**：`git remote -v` 应显示 `git@gitee.com-jane:foxprince/meetinginbeijing.git`
+
 ## 服务部署信息
 - 前端: 通过nginx直接提供静态文件服务，支持HTTPS
 - 后端:
