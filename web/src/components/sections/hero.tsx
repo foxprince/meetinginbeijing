@@ -5,6 +5,7 @@ import { useLanguage } from "@/app/providers";
 import { Button } from "@/components/ui/button";
 import { useCmsSection } from "@/hooks/use-cms-section";
 import { EditableSection } from "@/components/cms/editable-section";
+import { EditableImage } from "@/components/cms/editable-image";
 import { CheckCircle2 } from "lucide-react";
 
 export function Hero() {
@@ -16,6 +17,7 @@ export function Hero() {
     secondaryCTA: t.hero.secondaryCTA,
     trustPoints: t.hero.trustPoints,
     badges: t.hero.badges,
+    imageUrl: '',
   };
   const [cmsContent, setCmsContent] = React.useState<Record<string, unknown>>(cmsFallback);
   const fetchedContent = useCmsSection("hero", lang, cmsFallback);
@@ -38,6 +40,37 @@ export function Hero() {
   const badges = typeof badgesRaw === "object" && badgesRaw !== null
     ? badgesRaw as { responseTime?: string; fastReliable?: string }
     : t.hero.badges;
+
+  const imageUrl = typeof cmsContent.imageUrl === "string" ? cmsContent.imageUrl : '';
+
+  const handleImageSave = async (newImageUrl: string) => {
+    try {
+      const res = await fetch('/api/admin/cms', {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          section_key: 'hero',
+          locale: lang,
+          content: { ...cmsContent, imageUrl: newImageUrl },
+        }),
+      });
+
+      if (!res.ok) throw new Error('保存失败');
+
+      const publishRes = await fetch('/api/admin/cms', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ section_key: 'hero' }),
+      });
+
+      if (!publishRes.ok) throw new Error('发布失败');
+
+      setCmsContent({ ...cmsContent, imageUrl: newImageUrl });
+    } catch (error) {
+      console.error('保存图片失败:', error);
+      throw error;
+    }
+  };
 
   return (
     <section className="relative overflow-hidden bg-white pt-16 pb-24 md:pt-24 md:pb-32 px-6 md:px-12">
@@ -77,11 +110,13 @@ export function Hero() {
         </div>
 
         <div className="flex-1 relative w-full max-w-lg md:max-w-none">
-          <div className="aspect-square bg-slate-100 rounded-3xl overflow-hidden relative border-8 border-white shadow-2xl">
-            {/* Placeholder for professional photo */}
-            <div className="absolute inset-0 flex items-center justify-center text-slate-400 font-medium bg-gradient-to-br from-slate-100 to-slate-200">
-               [ Professional Portrait Image ]
-            </div>
+          <div className="relative border-8 border-white shadow-2xl rounded-3xl overflow-hidden">
+            <EditableImage
+              currentImageUrl={imageUrl}
+              onSave={handleImageSave}
+              alt="Professional Portrait"
+              aspectRatio="square"
+            />
             
             {/* Floating elements for visual interest */}
             <div className="absolute top-8 -right-4 bg-white p-4 rounded-xl shadow-lg border border-slate-100 hidden lg:block">

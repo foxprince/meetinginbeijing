@@ -5,6 +5,7 @@ import { useLanguage } from "@/app/providers";
 import { SectionWrapper } from "@/components/section-wrapper";
 import { useCmsSection } from "@/hooks/use-cms-section";
 import { EditableSection } from "@/components/cms/editable-section";
+import { EditableImage } from "@/components/cms/editable-image";
 import { CheckCircle2 } from "lucide-react";
 
 export function WhyChooseMe() {
@@ -12,6 +13,7 @@ export function WhyChooseMe() {
   const cmsFallback = {
     title: t.whyChooseMe.title,
     items: t.whyChooseMe.items,
+    imageUrl: '',
   };
   const [cmsContent, setCmsContent] = React.useState<Record<string, unknown>>(cmsFallback);
   const fetchedContent = useCmsSection("why_choose_me", lang, cmsFallback);
@@ -26,6 +28,37 @@ export function WhyChooseMe() {
   const items = Array.isArray(itemsRaw)
     ? itemsRaw.filter((item): item is string => typeof item === "string")
     : t.whyChooseMe.items;
+
+  const imageUrl = typeof cmsContent.imageUrl === "string" ? cmsContent.imageUrl : '';
+
+  const handleImageSave = async (newImageUrl: string) => {
+    try {
+      const res = await fetch('/api/admin/cms', {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          section_key: 'why_choose_me',
+          locale: lang,
+          content: { ...cmsContent, imageUrl: newImageUrl },
+        }),
+      });
+
+      if (!res.ok) throw new Error('保存失败');
+
+      const publishRes = await fetch('/api/admin/cms', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ section_key: 'why_choose_me' }),
+      });
+
+      if (!publishRes.ok) throw new Error('发布失败');
+
+      setCmsContent({ ...cmsContent, imageUrl: newImageUrl });
+    } catch (error) {
+      console.error('保存图片失败:', error);
+      throw error;
+    }
+  };
 
   return (
     <SectionWrapper id="why-choose-me">
@@ -52,8 +85,14 @@ export function WhyChooseMe() {
             ))}
           </div>
         </div>
-        <div className="bg-slate-100 rounded-3xl aspect-video md:aspect-square flex items-center justify-center text-slate-400 border-4 border-white shadow-xl">
-          [ Professional Beijing Context Image ]
+        <div className="border-4 border-white shadow-xl rounded-3xl overflow-hidden">
+          <EditableImage
+            currentImageUrl={imageUrl}
+            onSave={handleImageSave}
+            alt="Professional Beijing Context Image"
+            aspectRatio="square"
+            className="md:aspect-square aspect-video"
+          />
         </div>
       </div>
       </EditableSection>
