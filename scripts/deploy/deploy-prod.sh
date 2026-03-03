@@ -62,7 +62,7 @@ if ! command -v pnpm >/dev/null 2>&1; then
 fi
 
 cd "$APP_DIR"
-git remote set-url origin git@gitee.com:foxprince/meetinginbeijing.git 2>/dev/null || true
+git remote set-url origin git@gitee.com-jane:foxprince/meetinginbeijing.git 2>/dev/null || true
 git fetch origin "$BRANCH"
 git checkout "$BRANCH"
 git reset --hard origin/"$BRANCH"

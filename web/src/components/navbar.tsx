@@ -2,6 +2,7 @@
 
 import React from "react";
 import Link from "next/link";
+import { usePathname } from "next/navigation";
 import { useLanguage } from "@/app/providers";
 import { Button } from "@/components/ui/button";
 import { useCmsSection } from "@/hooks/use-cms-section";
@@ -10,8 +11,10 @@ import { EditableText } from "@/components/cms/editable-text";
 import { Globe } from "lucide-react";
 
 export function Navbar() {
+  const pathname = usePathname();
   const { lang, toggleLanguage, t } = useLanguage();
   const isAdmin = useAdminSession();
+  const isHomePage = pathname === '/';
   const cmsFallback = {
     brand_title: "MeetingInBeijing",
     brand_subtitle: "Your Beijing Companion",
@@ -103,21 +106,21 @@ export function Navbar() {
         </div>
 
         <div className="hidden md:flex items-center gap-8">
-          <a href="#about" className="text-sm font-medium hover:text-primary transition-colors">
+          <Link href={isHomePage ? "#about" : "/#about"} className="text-sm font-medium hover:text-primary transition-colors">
             {t.nav.about}
-          </a>
-          <a href="#services" className="text-sm font-medium hover:text-primary transition-colors">
+          </Link>
+          <Link href={isHomePage ? "#services" : "/#services"} className="text-sm font-medium hover:text-primary transition-colors">
             {t.nav.services}
-          </a>
-          <a href="#how-it-works" className="text-sm font-medium hover:text-primary transition-colors">
+          </Link>
+          <Link href={isHomePage ? "#how-it-works" : "/#how-it-works"} className="text-sm font-medium hover:text-primary transition-colors">
             {t.nav.howItWorks}
-          </a>
+          </Link>
           <Link href="/blog" className="text-sm font-medium hover:text-primary transition-colors">
             {t.nav.blog}
           </Link>
-          <a href="#contact" className="text-sm font-medium hover:text-primary transition-colors">
+          <Link href={isHomePage ? "#contact" : "/#contact"} className="text-sm font-medium hover:text-primary transition-colors">
             {t.nav.contact}
-          </a>
+          </Link>
         </div>
 
         <div className="flex items-center gap-4">
