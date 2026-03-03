@@ -15,6 +15,17 @@ export function getDefaultCmsSectionContent(
     };
   }
 
+  if (sectionKey === 'hero') {
+    return {
+      title: langContent.hero.title,
+      subtitle: langContent.hero.subtitle,
+      primaryCTA: langContent.hero.primaryCTA,
+      secondaryCTA: langContent.hero.secondaryCTA,
+      trustPoints: langContent.hero.trustPoints,
+      badges: langContent.hero.badges,
+    };
+  }
+
   if (sectionKey === 'who_i_help') {
     return {
       title: langContent.whoIHelp.title,
@@ -23,11 +34,30 @@ export function getDefaultCmsSectionContent(
     };
   }
 
-  return {
-    title: langContent.pricing.title,
-    disclaimer: langContent.pricing.disclaimer,
-    items: langContent.pricing.items,
-    transparent_text:
-      locale === 'zh' ? '透明收费，无隐藏费用' : 'Transparent & No hidden fees',
-  };
+  if (sectionKey === 'services') {
+    return {
+      title: langContent.services.title,
+      subtitle: langContent.services.subtitle,
+      items: langContent.services.items,
+    };
+  }
+
+  if (sectionKey === 'how_it_works') {
+    return {
+      title: langContent.howItWorks.title,
+      steps: langContent.howItWorks.steps,
+    };
+  }
+
+  if (sectionKey === 'pricing') {
+    return {
+      title: langContent.pricing.title,
+      disclaimer: langContent.pricing.disclaimer,
+      items: langContent.pricing.items,
+      transparent_text:
+        locale === 'zh' ? '透明收费，无隐藏费用' : 'Transparent & No hidden fees',
+    };
+  }
+
+  return {};
 }

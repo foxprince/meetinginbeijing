@@ -14,7 +14,10 @@ interface CmsApiResponse {
 
 const SECTION_LABELS: Record<CmsSectionKey, string> = {
   navbar: '导航栏',
+  hero: 'Hero 区块（首页主标题）',
   who_i_help: 'Who I Help 区块',
+  services: 'Services 区块（服务项目）',
+  how_it_works: 'How It Works 区块（工作流程）',
   pricing: 'Pricing 区块',
 };
 

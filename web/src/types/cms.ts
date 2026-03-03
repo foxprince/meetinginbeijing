@@ -1,6 +1,9 @@
 export const CMS_SECTION_KEYS = [
   'navbar',
+  'hero',
   'who_i_help',
+  'services',
+  'how_it_works',
   'pricing',
 ] as const;
 

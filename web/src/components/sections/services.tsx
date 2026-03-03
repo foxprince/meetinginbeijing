@@ -4,6 +4,8 @@ import React from "react";
 import { useLanguage } from "@/app/providers";
 import { SectionWrapper } from "@/components/section-wrapper";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { useCmsSection } from "@/hooks/use-cms-section";
+import { EditableSection } from "@/components/cms/editable-section";
 import { Briefcase, Building2, HeartPulse, ShoppingBag, Map, CalendarCheck } from "lucide-react";
 
 const iconMap: Record<string, React.ReactNode> = {
@@ -22,21 +24,49 @@ const iconMap: Record<string, React.ReactNode> = {
 };
 
 export function Services() {
-  const { t } = useLanguage();
+  const { lang, t } = useLanguage();
+  const cmsFallback = {
+    title: t.services.title,
+    subtitle: t.services.subtitle,
+    items: t.services.items,
+  };
+  const [cmsContent, setCmsContent] = React.useState<Record<string, unknown>>(cmsFallback);
+  const fetchedContent = useCmsSection("services", lang, cmsFallback);
+
+  React.useEffect(() => {
+    setCmsContent(fetchedContent);
+  }, [fetchedContent]);
+
+  const title = typeof cmsContent.title === "string" ? cmsContent.title : cmsFallback.title;
+  const subtitle = typeof cmsContent.subtitle === "string" ? cmsContent.subtitle : cmsFallback.subtitle;
+  
+  const itemsRaw = cmsContent.items;
+  const items = Array.isArray(itemsRaw)
+    ? itemsRaw.filter((item): item is { title: string; description: string } => 
+        typeof item === "object" && item !== null && "title" in item && "description" in item
+      )
+    : t.services.items;
 
   return (
     <SectionWrapper id="services" dark>
+      <EditableSection
+        sectionKey="services"
+        locale={lang}
+        currentContent={cmsContent}
+        onSave={() => setCmsContent(fetchedContent)}
+        editLabel="编辑 Services"
+      >
       <div className="text-center mb-16">
         <h2 className="text-3xl md:text-4xl font-bold text-slate-900 mb-4">
-          {t.services.title}
+          {title}
         </h2>
         <p className="text-lg text-slate-600 max-w-2xl mx-auto">
-          {t.services.subtitle}
+          {subtitle}
         </p>
       </div>
 
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-        {t.services.items.map((service, index) => (
+        {items.map((service, index) => (
           <Card key={index} className="border-none shadow-sm hover:shadow-md transition-shadow group overflow-hidden">
             <CardHeader className="pb-4">
               <div className="mb-4 transition-transform group-hover:scale-110 duration-300">
@@ -55,6 +85,7 @@ export function Services() {
           </Card>
         ))}
       </div>
+      </EditableSection>
     </SectionWrapper>
   );
 }

@@ -3,33 +3,71 @@
 import React from "react";
 import { useLanguage } from "@/app/providers";
 import { Button } from "@/components/ui/button";
+import { useCmsSection } from "@/hooks/use-cms-section";
+import { EditableSection } from "@/components/cms/editable-section";
 import { CheckCircle2 } from "lucide-react";
 
 export function Hero() {
-  const { t } = useLanguage();
+  const { lang, t } = useLanguage();
+  const cmsFallback = {
+    title: t.hero.title,
+    subtitle: t.hero.subtitle,
+    primaryCTA: t.hero.primaryCTA,
+    secondaryCTA: t.hero.secondaryCTA,
+    trustPoints: t.hero.trustPoints,
+    badges: t.hero.badges,
+  };
+  const [cmsContent, setCmsContent] = React.useState<Record<string, unknown>>(cmsFallback);
+  const fetchedContent = useCmsSection("hero", lang, cmsFallback);
+
+  React.useEffect(() => {
+    setCmsContent(fetchedContent);
+  }, [fetchedContent]);
+
+  const title = typeof cmsContent.title === "string" ? cmsContent.title : cmsFallback.title;
+  const subtitle = typeof cmsContent.subtitle === "string" ? cmsContent.subtitle : cmsFallback.subtitle;
+  const primaryCTA = typeof cmsContent.primaryCTA === "string" ? cmsContent.primaryCTA : cmsFallback.primaryCTA;
+  const secondaryCTA = typeof cmsContent.secondaryCTA === "string" ? cmsContent.secondaryCTA : cmsFallback.secondaryCTA;
+  
+  const trustPointsRaw = cmsContent.trustPoints;
+  const trustPoints = Array.isArray(trustPointsRaw) 
+    ? trustPointsRaw.filter((p): p is string => typeof p === "string")
+    : t.hero.trustPoints;
+
+  const badgesRaw = cmsContent.badges;
+  const badges = typeof badgesRaw === "object" && badgesRaw !== null
+    ? badgesRaw as { responseTime?: string; fastReliable?: string }
+    : t.hero.badges;
 
   return (
     <section className="relative overflow-hidden bg-white pt-16 pb-24 md:pt-24 md:pb-32 px-6 md:px-12">
+      <EditableSection
+        sectionKey="hero"
+        locale={lang}
+        currentContent={cmsContent}
+        onSave={() => setCmsContent(fetchedContent)}
+        editLabel="编辑 Hero 区块"
+      >
       <div className="max-w-7xl mx-auto flex flex-col md:flex-row items-center gap-12 md:gap-16">
         <div className="flex-1 text-center md:text-left">
           <h1 className="text-4xl md:text-6xl font-extrabold tracking-tight text-slate-900 mb-6 leading-[1.1]">
-            {t.hero.title}
+            {title}
           </h1>
           <p className="text-lg md:text-xl text-slate-600 mb-8 max-w-2xl mx-auto md:mx-0 leading-relaxed">
-            {t.hero.subtitle}
+            {subtitle}
           </p>
           
           <div className="flex flex-col sm:flex-row gap-4 justify-center md:justify-start mb-10">
             <Button size="lg" className="bg-primary hover:bg-primary/90 text-white px-8 py-6 text-lg rounded-full">
-              {t.hero.primaryCTA}
+              {primaryCTA}
             </Button>
             <Button size="lg" variant="outline" className="px-8 py-6 text-lg border-2 rounded-full">
-              {t.hero.secondaryCTA}
+              {secondaryCTA}
             </Button>
           </div>
 
           <div className="flex flex-wrap justify-center md:justify-start gap-6">
-            {t.hero.trustPoints.map((point, index) => (
+            {trustPoints.map((point, index) => (
               <div key={index} className="flex items-center gap-2 text-slate-500 font-medium">
                 <CheckCircle2 className="h-5 w-5 text-primary" />
                 <span>{point}</span>
@@ -52,8 +90,8 @@ export function Hero() {
                   <CheckCircle2 className="h-4 w-4 text-primary" />
                 </div>
                 <div>
-                  <p className="text-xs font-bold text-slate-900">{t.hero.badges.responseTime}</p>
-                  <p className="text-[10px] text-slate-500">{t.hero.badges.fastReliable}</p>
+                  <p className="text-xs font-bold text-slate-900">{badges.responseTime || t.hero.badges.responseTime}</p>
+                  <p className="text-[10px] text-slate-500">{badges.fastReliable || t.hero.badges.fastReliable}</p>
                 </div>
               </div>
             </div>
@@ -64,6 +102,7 @@ export function Hero() {
           <div className="absolute -z-10 -top-8 -right-8 w-64 h-64 bg-accent/20 rounded-full blur-3xl opacity-60" />
         </div>
       </div>
+      </EditableSection>
     </section>
   );
 }
