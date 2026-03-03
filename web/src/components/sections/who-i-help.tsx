@@ -3,6 +3,7 @@
 import React from "react";
 import { useLanguage } from "@/app/providers";
 import { useCmsSection } from "@/hooks/use-cms-section";
+import { EditableSection } from "@/components/cms/editable-section";
 import { SectionWrapper } from "@/components/section-wrapper";
 import { Users, Stethoscope, Home } from "lucide-react";
 
@@ -20,7 +21,12 @@ export function WhoIHelp() {
     description: t.whoIHelp.description,
     items: fallbackItems,
   };
-  const cmsContent = useCmsSection("who_i_help", lang, cmsFallback);
+  const [cmsContent, setCmsContent] = React.useState<Record<string, unknown>>(cmsFallback);
+  const fetchedContent = useCmsSection("who_i_help", lang, cmsFallback);
+
+  React.useEffect(() => {
+    setCmsContent(fetchedContent);
+  }, [fetchedContent]);
   const cmsItemsRaw = cmsContent.items;
   const cmsItems = Array.isArray(cmsItemsRaw)
     ? cmsItemsRaw
@@ -52,6 +58,13 @@ export function WhoIHelp() {
 
   return (
     <SectionWrapper id="about">
+      <EditableSection
+        sectionKey="who_i_help"
+        locale={lang}
+        currentContent={cmsContent}
+        onSave={() => setCmsContent(fetchedContent)}
+        editLabel="编辑 Who I Help"
+      >
       <div className="flex flex-col items-center gap-10 mb-16">
         <div className="w-full overflow-auto">
           <img
@@ -83,6 +96,7 @@ export function WhoIHelp() {
           </div>
         ))}
       </div>
+      </EditableSection>
     </SectionWrapper>
   );
 }

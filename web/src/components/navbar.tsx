@@ -5,17 +5,25 @@ import Link from "next/link";
 import { useLanguage } from "@/app/providers";
 import { Button } from "@/components/ui/button";
 import { useCmsSection } from "@/hooks/use-cms-section";
+import { useAdminSession } from "@/hooks/use-admin-session";
+import { EditableText } from "@/components/cms/editable-text";
 import { Globe } from "lucide-react";
 
 export function Navbar() {
   const { lang, toggleLanguage, t } = useLanguage();
+  const isAdmin = useAdminSession();
   const cmsFallback = {
     brand_title: "MeetingInBeijing",
     brand_subtitle: "Your Beijing Companion",
     cta_text: t.nav.cta,
   };
 
-  const cmsContent = useCmsSection("navbar", lang, cmsFallback);
+  const [cmsContent, setCmsContent] = React.useState<Record<string, unknown>>(cmsFallback);
+  const fetchedContent = useCmsSection("navbar", lang, cmsFallback);
+
+  React.useEffect(() => {
+    setCmsContent(fetchedContent);
+  }, [fetchedContent]);
   const brandTitle =
     typeof cmsContent.brand_title === "string"
       ? cmsContent.brand_title
@@ -29,6 +37,32 @@ export function Navbar() {
       ? cmsContent.cta_text
       : cmsFallback.cta_text;
 
+  const handleSave = async (field: string, value: string) => {
+    const newContent = { ...cmsContent, [field]: value };
+
+    const res = await fetch('/api/admin/cms', {
+      method: 'PUT',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        section_key: 'navbar',
+        locale: lang,
+        content: newContent,
+      }),
+    });
+
+    if (!res.ok) throw new Error('保存失败');
+
+    const publishRes = await fetch('/api/admin/cms', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ section_key: 'navbar' }),
+    });
+
+    if (!publishRes.ok) throw new Error('发布失败');
+
+    setCmsContent(newContent);
+  };
+
   return (
     <nav className="sticky top-0 z-50 w-full border-b bg-white/90 backdrop-blur-lg">
       <div className="max-w-7xl mx-auto px-6 md:px-12 flex h-28 items-center justify-between gap-6">
@@ -41,12 +75,30 @@ export function Navbar() {
             />
           </div>
           <div className="flex flex-col leading-tight">
-            <span className="font-black text-2xl sm:text-3xl tracking-tight text-slate-900">
-              {brandTitle}
-            </span>
-            <span className="text-sm sm:text-base text-slate-500">
-              {brandSubtitle}
-            </span>
+            {isAdmin ? (
+              <EditableText
+                value={brandTitle}
+                onSave={(v) => handleSave('brand_title', v)}
+                as="span"
+                className="font-black text-2xl sm:text-3xl tracking-tight text-slate-900"
+              />
+            ) : (
+              <span className="font-black text-2xl sm:text-3xl tracking-tight text-slate-900">
+                {brandTitle}
+              </span>
+            )}
+            {isAdmin ? (
+              <EditableText
+                value={brandSubtitle}
+                onSave={(v) => handleSave('brand_subtitle', v)}
+                as="span"
+                className="text-sm sm:text-base text-slate-500"
+              />
+            ) : (
+              <span className="text-sm sm:text-base text-slate-500">
+                {brandSubtitle}
+              </span>
+            )}
           </div>
         </div>
 

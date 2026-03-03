@@ -40,6 +40,26 @@ MeetingInBeijing 是一个为在北京生活和工作的人提供信息和资源
 - `POST /api/admin/cms`：后台发布区块
 - `GET /api/cms/section?key=...&lang=en|zh`：前台读取已发布内容
 
+### 前台内联编辑（所见即所得）
+管理员登录后访问前台页面时，可直接编辑内容：
+
+**Navbar 区块**：
+- 品牌标题、副标题文本旁显示铅笔图标（hover 可见）
+- 点击进入编辑态，输入框内修改
+- 按 Enter 保存，Esc 取消
+- 自动保存草稿并发布到前台
+
+**Who I Help / Pricing 区块**：
+- 区块右上角显示"编辑"按钮（hover 可见）
+- 点击弹出表单 Modal，编辑标题、描述、列表项等
+- 点击"保存并发布"立即生效
+
+**实现组件**：
+- `@/hooks/use-admin-session.ts`：检测管理员登录状态（读取 cookie）
+- `@/components/cms/editable-text.tsx`：单行/多行文本内联编辑
+- `@/components/cms/editable-section.tsx`：区块级表单编辑
+- `@/components/cms/inline-edit-button.tsx`：铅笔图标按钮
+
 ## 项目结构
 ```
 /web                    # Next.js 前端应用

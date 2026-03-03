@@ -5,6 +5,7 @@ import { useLanguage } from "@/app/providers";
 import { SectionWrapper } from "@/components/section-wrapper";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { useCmsSection } from "@/hooks/use-cms-section";
+import { EditableSection } from "@/components/cms/editable-section";
 import { Check } from "lucide-react";
 
 export function Pricing() {
@@ -23,7 +24,12 @@ export function Pricing() {
       lang === "zh" ? "透明收费，无隐藏费用" : "Transparent & No hidden fees",
   };
 
-  const cmsContent = useCmsSection("pricing", lang, cmsFallback);
+  const [cmsContent, setCmsContent] = React.useState<Record<string, unknown>>(cmsFallback);
+  const fetchedContent = useCmsSection("pricing", lang, cmsFallback);
+
+  React.useEffect(() => {
+    setCmsContent(fetchedContent);
+  }, [fetchedContent]);
   const cmsItemsRaw = cmsContent.items;
   const cmsItems = Array.isArray(cmsItemsRaw)
     ? cmsItemsRaw
@@ -64,6 +70,13 @@ export function Pricing() {
 
   return (
     <SectionWrapper id="pricing" dark>
+      <EditableSection
+        sectionKey="pricing"
+        locale={lang}
+        currentContent={cmsContent}
+        onSave={() => setCmsContent(fetchedContent)}
+        editLabel="编辑 Pricing"
+      >
       <div className="text-center mb-16">
         <h2 className="text-3xl md:text-4xl font-bold text-slate-900 mb-4">
           {title}
@@ -94,6 +107,7 @@ export function Pricing() {
           </Card>
         ))}
       </div>
+      </EditableSection>
     </SectionWrapper>
   );
 }
