@@ -73,5 +73,21 @@ export function getDefaultCmsSectionContent(
     };
   }
 
+  if (sectionKey === 'faq') {
+    return {
+      title: langContent.faq.title,
+      items: langContent.faq.items,
+    };
+  }
+
+  if (sectionKey === 'final_cta') {
+    return {
+      title: langContent.finalCTA.title,
+      subtitle: langContent.finalCTA.subtitle,
+      primary: langContent.finalCTA.primary,
+      secondary: langContent.finalCTA.secondary,
+    };
+  }
+
   return {};
 }

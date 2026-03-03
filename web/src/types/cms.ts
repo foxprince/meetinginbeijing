@@ -7,6 +7,8 @@ export const CMS_SECTION_KEYS = [
   'why_choose_me',
   'testimonials',
   'pricing',
+  'faq',
+  'final_cta',
 ] as const;
 
 export type CmsSectionKey = (typeof CMS_SECTION_KEYS)[number];

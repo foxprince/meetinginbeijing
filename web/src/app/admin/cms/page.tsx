@@ -21,6 +21,8 @@ const SECTION_LABELS: Record<CmsSectionKey, string> = {
   why_choose_me: 'Why Choose Me 区块（客户信任理由）',
   testimonials: 'Testimonials 区块（客户反馈）',
   pricing: 'Pricing 区块',
+  faq: 'FAQ 区块（常见问题）',
+  final_cta: 'Final CTA 区块（最终行动号召）',
 };
 
 function safeParseJson(value: string): Record<string, unknown> {
