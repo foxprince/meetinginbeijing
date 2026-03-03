@@ -1,7 +1,15 @@
 #!/usr/bin/env bash
 set -euo pipefail
 
-REPO_ROOT=$(cd "$(dirname "$0")/../.." && pwd)
+SCRIPT_DIR=$(cd "$(dirname "$0")" && pwd)
+if ! REPO_ROOT=$(git -C "$SCRIPT_DIR" rev-parse --show-toplevel 2>/dev/null); then
+  if [ -d "$SCRIPT_DIR/.." ]; then
+    REPO_ROOT=$(cd "$SCRIPT_DIR/.." && pwd)
+  else
+    echo "无法定位仓库根目录，请从项目内部执行此脚本"
+    exit 1
+  fi
+fi
 cd "$REPO_ROOT"
 
 if [ $# -lt 1 ]; then
@@ -11,7 +19,7 @@ fi
 
 COMMIT_MESSAGE="$1"
 BRANCH=${DEPLOY_BRANCH:-master}
-REMOTE_SSH=${REMOTE_SSH_BIN:-$HOME/bin/toYDDECS}
+REMOTE_SSH=${REMOTE_SSH_BIN:-$HOME/bin/toYddEcs}
 REMOTE_REPO_DIR=${REMOTE_REPO_DIR:-/home/app/git/meetinginbeijing}
 REMOTE_SERVICE_NAME=${REMOTE_SERVICE_NAME:-meetinginbeijing-web}
 REMOTE_DOMAIN=${REMOTE_DOMAIN:-jane.ydd-club.com}
