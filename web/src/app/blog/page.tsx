@@ -31,7 +31,10 @@ interface BlogListResponse {
 }
 
 async function getBlogPosts(lang: string = 'en'): Promise<BlogListResponse> {
-  const baseUrl = process.env.NEXT_PUBLIC_BASE_URL || 'http://localhost:3000';
+  const baseUrl =
+    process.env.NEXT_PUBLIC_BASE_URL ||
+    process.env.INTERNAL_BASE_URL ||
+    'http://127.0.0.1:3003';
   const res = await fetch(`${baseUrl}/api/blog?lang=${lang}&status=published&page=1&pageSize=12`, {
     next: { revalidate: 60 }, // 每分钟重新验证
   });
