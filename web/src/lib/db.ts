@@ -99,10 +99,25 @@ export async function initDb() {
     );
   `);
 
+  await client.query(`
+    CREATE TABLE IF NOT EXISTS cms_sections (
+      section_key VARCHAR(100) PRIMARY KEY,
+      draft_content_en JSONB NOT NULL DEFAULT '{}'::jsonb,
+      draft_content_zh JSONB NOT NULL DEFAULT '{}'::jsonb,
+      published_content_en JSONB NOT NULL DEFAULT '{}'::jsonb,
+      published_content_zh JSONB NOT NULL DEFAULT '{}'::jsonb,
+      status VARCHAR(20) NOT NULL DEFAULT 'draft',
+      created_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP,
+      updated_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP,
+      published_at TIMESTAMP WITH TIME ZONE
+    );
+  `);
+
   // 创建索引
   await client.query('CREATE INDEX IF NOT EXISTS idx_blog_posts_status ON blog_posts(status);');
   await client.query('CREATE INDEX IF NOT EXISTS idx_blog_posts_published_at ON blog_posts(published_at DESC);');
   await client.query('CREATE INDEX IF NOT EXISTS idx_blog_posts_slug ON blog_posts(slug);');
+  await client.query('CREATE INDEX IF NOT EXISTS idx_cms_sections_status ON cms_sections(status);');
 
   client.release();
   console.log('Database initialized successfully');

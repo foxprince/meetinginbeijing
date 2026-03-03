@@ -43,10 +43,10 @@ export const LanguageProvider = ({ children }: { children: ReactNode }) => {
 
   const t = content[lang];
 
-  return (
-    <LanguageContext.Provider value={{ lang, toggleLanguage, t }}>
-      {children}
-    </LanguageContext.Provider>
+  return React.createElement(
+    LanguageContext.Provider,
+    { value: { lang, toggleLanguage, t } },
+    children
   );
 };
 

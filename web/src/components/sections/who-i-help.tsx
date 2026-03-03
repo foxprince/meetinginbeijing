@@ -2,6 +2,7 @@
 
 import React from "react";
 import { useLanguage } from "@/app/providers";
+import { useCmsSection } from "@/hooks/use-cms-section";
 import { SectionWrapper } from "@/components/section-wrapper";
 import { Users, Stethoscope, Home } from "lucide-react";
 
@@ -12,7 +13,42 @@ const helpIcons = [
 ];
 
 export function WhoIHelp() {
-  const { t } = useLanguage();
+  const { lang, t } = useLanguage();
+  const fallbackItems = t.whoIHelp.items as { title: string; description: string }[];
+  const cmsFallback = {
+    title: t.whoIHelp.title,
+    description: t.whoIHelp.description,
+    items: fallbackItems,
+  };
+  const cmsContent = useCmsSection("who_i_help", lang, cmsFallback);
+  const cmsItemsRaw = cmsContent.items;
+  const cmsItems = Array.isArray(cmsItemsRaw)
+    ? cmsItemsRaw
+        .filter((item) => !!item && typeof item === "object")
+        .map((item) => item as { title?: string; description?: string })
+    : [];
+  const title =
+    typeof cmsContent.title === "string"
+      ? cmsContent.title
+      : cmsFallback.title;
+  const description =
+    typeof cmsContent.description === "string"
+      ? cmsContent.description
+      : cmsFallback.description;
+  const items =
+    cmsItems.length > 0
+      ? cmsItems.map((item, index) => ({
+          title:
+            typeof item.title === "string" && item.title.trim().length > 0
+              ? item.title
+              : fallbackItems[index]?.title || "",
+          description:
+            typeof item.description === "string" &&
+            item.description.trim().length > 0
+              ? item.description
+              : fallbackItems[index]?.description || "",
+        }))
+      : fallbackItems;
 
   return (
     <SectionWrapper id="about">
@@ -27,18 +63,18 @@ export function WhoIHelp() {
           />
         </div>
         <h2 className="text-3xl md:text-4xl font-bold text-slate-900 mb-4">
-          {t.whoIHelp.title}
+          {title}
         </h2>
         <p className="text-lg text-slate-600 max-w-2xl mx-auto">
-          {t.whoIHelp.description}
+          {description}
         </p>
       </div>
 
       <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
-        {t.whoIHelp.items.map((item: { title: string; description: string }, index: number) => (
+        {items.map((item, index: number) => (
           <div key={index} className="flex flex-col items-center text-center p-8 rounded-2xl bg-white border border-slate-100 shadow-sm hover:shadow-md transition-shadow">
             <div className="mb-6 p-4 bg-secondary rounded-full">
-              {helpIcons[index]}
+              {helpIcons[index] || helpIcons[0]}
             </div>
             <h3 className="text-xl font-bold text-slate-900 mb-4">{item.title}</h3>
             <p className="text-slate-600 leading-relaxed">

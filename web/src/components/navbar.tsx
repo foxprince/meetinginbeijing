@@ -4,10 +4,30 @@ import React from "react";
 import Link from "next/link";
 import { useLanguage } from "@/app/providers";
 import { Button } from "@/components/ui/button";
+import { useCmsSection } from "@/hooks/use-cms-section";
 import { Globe } from "lucide-react";
 
 export function Navbar() {
   const { lang, toggleLanguage, t } = useLanguage();
+  const cmsFallback = {
+    brand_title: "MeetingInBeijing",
+    brand_subtitle: "Your Beijing Companion",
+    cta_text: t.nav.cta,
+  };
+
+  const cmsContent = useCmsSection("navbar", lang, cmsFallback);
+  const brandTitle =
+    typeof cmsContent.brand_title === "string"
+      ? cmsContent.brand_title
+      : cmsFallback.brand_title;
+  const brandSubtitle =
+    typeof cmsContent.brand_subtitle === "string"
+      ? cmsContent.brand_subtitle
+      : cmsFallback.brand_subtitle;
+  const ctaText =
+    typeof cmsContent.cta_text === "string"
+      ? cmsContent.cta_text
+      : cmsFallback.cta_text;
 
   return (
     <nav className="sticky top-0 z-50 w-full border-b bg-white/90 backdrop-blur-lg">
@@ -22,10 +42,10 @@ export function Navbar() {
           </div>
           <div className="flex flex-col leading-tight">
             <span className="font-black text-2xl sm:text-3xl tracking-tight text-slate-900">
-              MeetingInBeijing
+              {brandTitle}
             </span>
             <span className="text-sm sm:text-base text-slate-500">
-              Your Beijing Companion
+              {brandSubtitle}
             </span>
           </div>
         </div>
@@ -59,7 +79,7 @@ export function Navbar() {
             <span>{lang === "en" ? "中文" : "EN"}</span>
           </Button>
           <Button size="sm" className="bg-primary hover:bg-primary/90 text-white hidden sm:flex">
-            {t.nav.cta}
+            {ctaText}
           </Button>
         </div>
       </div>

@@ -308,6 +308,11 @@ export default function AdminBlogPage() {
             <span className="font-medium text-slate-900">Blog</span>
           </div>
           <div className="flex items-center gap-4">
+            <Link href="/admin/cms">
+              <Button variant="outline" size="sm">
+                CMS
+              </Button>
+            </Link>
             <Link href="/blog">
               <Button variant="ghost" size="sm">
                 <Eye className="w-4 h-4 mr-2" />

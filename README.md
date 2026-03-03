@@ -9,6 +9,37 @@ MeetingInBeijing 是一个为在北京生活和工作的人提供信息和资源
 - **数据库**: PostgreSQL
 - **部署**: Nginx + systemd
 
+## 简单 CMS 功能（MVP）
+
+### 后台入口
+- `/admin/cms`
+
+### 当前支持可编辑区块
+- `navbar`（品牌标题、副标题、CTA 文案）
+- `who_i_help`（标题、描述、卡片列表）
+- `pricing`（标题、免责声明、价格卡片、透明收费文案）
+
+### 数据结构
+- 表名：`cms_sections`
+- 字段：
+  - `section_key`（主键）
+  - `draft_content_en` / `draft_content_zh`
+  - `published_content_en` / `published_content_zh`
+  - `status`（`draft` / `published`）
+  - `published_at` / `created_at` / `updated_at`
+
+### 发布流程
+1. 在 `/admin/cms` 编辑英文和中文 JSON 草稿。
+2. 点击“保存草稿”。
+3. 点击“发布到前台”，将草稿拷贝到已发布内容。
+4. 前台组件通过 `/api/cms/section` 获取已发布内容；若 CMS 异常，自动回退到 `src/config/content.ts` 默认文案。
+
+### 相关接口
+- `GET /api/admin/cms`：后台读取区块列表
+- `PUT /api/admin/cms`：后台保存草稿
+- `POST /api/admin/cms`：后台发布区块
+- `GET /api/cms/section?key=...&lang=en|zh`：前台读取已发布内容
+
 ## 项目结构
 ```
 /web                    # Next.js 前端应用
