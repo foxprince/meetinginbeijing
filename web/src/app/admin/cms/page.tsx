@@ -24,6 +24,8 @@ const SECTION_LABELS: Record<CmsSectionKey, string> = {
   pricing: 'Pricing 区块',
   faq: 'FAQ 区块（常见问题）',
   final_cta: 'Final CTA 区块（最终行动号召）',
+  privacy_policy: 'Privacy Policy（隐私政策）',
+  terms_of_service: 'Terms of Service（服务条款）',
 };
 
 function safeParseJson(value: string): Record<string, unknown> {

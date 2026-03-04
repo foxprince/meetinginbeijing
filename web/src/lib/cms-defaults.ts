@@ -1,4 +1,8 @@
 import { content } from '@/config/content';
+import {
+  PRIVACY_POLICY_DEFAULTS,
+  TERMS_OF_SERVICE_DEFAULTS,
+} from '@/lib/legal-content';
 import { CmsLocale, CmsSectionKey } from '@/types/cms';
 
 export function getDefaultCmsSectionContent(
@@ -87,6 +91,14 @@ export function getDefaultCmsSectionContent(
       primary: langContent.finalCTA.primary,
       secondary: langContent.finalCTA.secondary,
     };
+  }
+
+  if (sectionKey === 'privacy_policy') {
+    return PRIVACY_POLICY_DEFAULTS[locale] as unknown as Record<string, unknown>;
+  }
+
+  if (sectionKey === 'terms_of_service') {
+    return TERMS_OF_SERVICE_DEFAULTS[locale] as unknown as Record<string, unknown>;
   }
 
   return {};

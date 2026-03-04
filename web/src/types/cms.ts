@@ -9,6 +9,8 @@ export const CMS_SECTION_KEYS = [
   'pricing',
   'faq',
   'final_cta',
+  'privacy_policy',
+  'terms_of_service',
 ] as const;
 
 export type CmsSectionKey = (typeof CMS_SECTION_KEYS)[number];
