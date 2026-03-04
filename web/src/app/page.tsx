@@ -1,5 +1,4 @@
-"use client";
-
+import { Suspense } from "react";
 import { Navbar } from "@/components/navbar";
 import { Hero } from "@/components/sections/hero";
 import { WhoIHelp } from "@/components/sections/who-i-help";
@@ -13,7 +12,9 @@ import { ContactForm } from "@/components/sections/contact-form";
 export default function Home() {
   return (
     <main className="min-h-screen">
-      <Navbar />
+      <Suspense fallback={<nav className="sticky top-0 z-50 w-full border-b bg-white/90 backdrop-blur-lg"><div className="h-28 w-full" /></nav>}>
+        <Navbar />
+      </Suspense>
       <Hero />
       <WhoIHelp />
       <Services />

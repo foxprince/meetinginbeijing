@@ -14,21 +14,8 @@ interface LanguageContextProps {
 
 const LanguageContext = createContext<LanguageContextProps | undefined>(undefined);
 
-function getPreferredLanguage(): Language {
-  if (typeof window === "undefined") {
-    return "en";
-  }
-
-  const savedLang = window.localStorage.getItem("lang") as Language | null;
-  if (savedLang === "en" || savedLang === "zh") {
-    return savedLang;
-  }
-
-  return window.navigator.language.startsWith("zh") ? "zh" : "en";
-}
-
 function LanguageProvider({ children }: { children: ReactNode }): React.JSX.Element {
-  const [lang, setLang] = useState<Language>(() => getPreferredLanguage());
+  const [lang, setLang] = useState<Language>("en");
 
   useEffect(() => {
     if (typeof window === "undefined") {
@@ -36,11 +23,12 @@ function LanguageProvider({ children }: { children: ReactNode }): React.JSX.Elem
     }
 
     const savedLang = window.localStorage.getItem("lang") as Language | null;
-    if (savedLang && (savedLang === "en" || savedLang === "zh") && savedLang !== lang) {
-      // eslint-disable-next-line react-hooks/set-state-in-effect
+    if (savedLang === "en" || savedLang === "zh") {
       setLang(savedLang);
+    } else if (window.navigator.language.startsWith("zh")) {
+      setLang("zh");
     }
-  }, [lang]);
+  }, []);
 
   const toggleLanguage = () => {
     const newLang = lang === "en" ? "zh" : "en";
