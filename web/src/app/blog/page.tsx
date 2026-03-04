@@ -1,6 +1,7 @@
 import { Metadata } from 'next';
 import Link from 'next/link';
 import Image from 'next/image';
+import { Suspense } from 'react';
 import { Navbar } from '@/components/navbar';
 import { Footer } from '@/components/sections/footer-faq-cta';
 import { Button } from '@/components/ui/button';
@@ -93,7 +94,9 @@ export default async function BlogPage({
 
   return (
     <main className="min-h-screen bg-gradient-to-b from-white to-secondary/30">
-      <Navbar />
+      <Suspense fallback={<div className="h-28 w-full" />}>
+        <Navbar />
+      </Suspense>
 
       {/* Hero Section */}
       <section className="py-20 px-6 md:px-12">
