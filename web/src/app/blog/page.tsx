@@ -96,7 +96,7 @@ export default async function BlogPage({
 
   return (
     <main className="min-h-screen bg-gradient-to-b from-white to-secondary/30">
-      <Suspense fallback={<div className="h-28 w-full" />}>
+      <Suspense fallback={<nav className="sticky top-0 z-50 w-full border-b bg-white/90 backdrop-blur-lg"><div className="h-28 w-full" /></nav>}>
         <Navbar />
       </Suspense>
 
