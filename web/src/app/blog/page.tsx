@@ -80,10 +80,11 @@ function resolveParam(value: string | string[] | undefined): string | undefined 
 export default async function BlogPage({
   searchParams,
 }: {
-  searchParams?: BlogSearchParams;
+  searchParams: Promise<BlogSearchParams>;
 }) {
-  const langParam = resolveParam(searchParams?.lang);
-  const pageParam = resolveParam(searchParams?.page);
+  const params = await searchParams;
+  const langParam = resolveParam(params?.lang);
+  const pageParam = resolveParam(params?.page);
   const lang = langParam === 'zh' ? 'zh' : 'en';
   const page = Number(pageParam) >= 1 ? Number(pageParam) : 1;
 
