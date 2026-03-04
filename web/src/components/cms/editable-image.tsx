@@ -4,6 +4,7 @@ import { useState } from 'react';
 import { Upload, X } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { useAdminSession } from '@/hooks/use-admin-session';
+import { isOssPublicImageUrl } from '@/lib/image';
 import Image from 'next/image';
 
 interface EditableImageProps {
@@ -89,6 +90,7 @@ export function EditableImage({
           src={displayUrl}
           alt={alt}
           fill
+          unoptimized={isOssPublicImageUrl(displayUrl)}
           className="object-cover"
         />
       </div>
@@ -103,6 +105,7 @@ export function EditableImage({
             src={displayUrl}
             alt={alt}
             fill
+            unoptimized={isOssPublicImageUrl(displayUrl)}
             className="object-cover"
           />
           <div className="absolute inset-0 bg-black/50 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center">
