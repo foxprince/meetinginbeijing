@@ -122,21 +122,25 @@ export function Navbar() {
         </div>
 
         <div className="hidden md:flex items-center gap-8">
-          <Link href={isHomePage ? "#about" : "/#about"} className="text-sm font-medium hover:text-primary transition-colors">
-            {t.nav.about}
-          </Link>
-          <Link href={isHomePage ? "#services" : "/#services"} className="text-sm font-medium hover:text-primary transition-colors">
-            {t.nav.services}
-          </Link>
-          <Link href={isHomePage ? "#how-it-works" : "/#how-it-works"} className="text-sm font-medium hover:text-primary transition-colors">
-            {t.nav.howItWorks}
-          </Link>
-          <Link href={`/blog?lang=${lang}`} className="text-sm font-medium hover:text-primary transition-colors">
-            {t.nav.blog}
-          </Link>
-          <Link href={isHomePage ? "#contact" : "/#contact"} className="text-sm font-medium hover:text-primary transition-colors">
-            {t.nav.contact}
-          </Link>
+          {mounted && (
+            <>
+              <Link href={isHomePage ? "#about" : "/#about"} className="text-sm font-medium hover:text-primary transition-colors">
+                {t.nav.about}
+              </Link>
+              <Link href={isHomePage ? "#services" : "/#services"} className="text-sm font-medium hover:text-primary transition-colors">
+                {t.nav.services}
+              </Link>
+              <Link href={isHomePage ? "#how-it-works" : "/#how-it-works"} className="text-sm font-medium hover:text-primary transition-colors">
+                {t.nav.howItWorks}
+              </Link>
+              <Link href={`/blog?lang=${lang}`} className="text-sm font-medium hover:text-primary transition-colors">
+                {t.nav.blog}
+              </Link>
+              <Link href={isHomePage ? "#contact" : "/#contact"} className="text-sm font-medium hover:text-primary transition-colors">
+                {t.nav.contact}
+              </Link>
+            </>
+          )}
         </div>
 
         <div className="flex items-center gap-4">
@@ -149,9 +153,11 @@ export function Navbar() {
             <Globe className="h-4 w-4" />
             <span>{mounted ? (lang === "en" ? "中文" : "EN") : "中文"}</span>
           </Button>
-          <Button size="sm" className="bg-primary hover:bg-primary/90 text-white hidden sm:flex">
-            {ctaText}
-          </Button>
+          {mounted && (
+            <Button size="sm" className="bg-primary hover:bg-primary/90 text-white hidden sm:flex">
+              {ctaText}
+            </Button>
+          )}
         </div>
       </div>
     </nav>
