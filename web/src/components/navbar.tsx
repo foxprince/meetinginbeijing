@@ -13,7 +13,7 @@ import { Globe } from "lucide-react";
 export function Navbar() {
   const pathname = usePathname();
   const searchParams = useSearchParams();
-  const { lang, t } = useLanguage();
+  const { lang, toggleLanguage, t } = useLanguage();
   const isAdmin = useAdminSession();
   const isHomePage = pathname === '/';
   const cmsFallback = {
@@ -143,13 +143,24 @@ export function Navbar() {
         </div>
 
         <div className="flex items-center gap-4">
-          <a
-            href={languageSwitchHref}
-            className="inline-flex items-center gap-2 h-8 px-3 rounded-md text-sm font-medium hover:bg-slate-100 transition-colors"
-          >
-            <Globe className="h-4 w-4" />
-            <span>{mounted ? (activeLang === "en" ? "中文" : "EN") : "中文"}</span>
-          </a>
+          {pathname.startsWith("/blog") ? (
+            <a
+              href={languageSwitchHref}
+              className="inline-flex items-center gap-2 h-8 px-3 rounded-md text-sm font-medium hover:bg-slate-100 transition-colors"
+            >
+              <Globe className="h-4 w-4" />
+              <span>{mounted ? (activeLang === "en" ? "中文" : "EN") : "中文"}</span>
+            </a>
+          ) : (
+            <button
+              type="button"
+              onClick={toggleLanguage}
+              className="inline-flex items-center gap-2 h-8 px-3 rounded-md text-sm font-medium hover:bg-slate-100 transition-colors"
+            >
+              <Globe className="h-4 w-4" />
+              <span>{mounted ? (activeLang === "en" ? "中文" : "EN") : "中文"}</span>
+            </button>
+          )}
           {mounted && (
             <Button size="sm" className="bg-primary hover:bg-primary/90 text-white hidden sm:flex">
               {ctaText}
