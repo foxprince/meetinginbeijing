@@ -1,5 +1,4 @@
 import { Pool } from 'pg';
-import type { PoolConfig } from 'pg';
 import * as fs from 'fs';
 import * as path from 'path';
 
@@ -36,7 +35,9 @@ if (!connectionString) {
 process.env.NODE_TLS_REJECT_UNAUTHORIZED = '0';
 
 // 解析连接字符串，正确处理 URL 编码的密码
-let poolConfig: PoolConfig = {
+type PgPoolConfig = ConstructorParameters<typeof Pool>[0];
+
+let poolConfig: PgPoolConfig = {
   connectionString,
   ssl: {
     rejectUnauthorized: false,
