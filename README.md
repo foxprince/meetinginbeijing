@@ -149,3 +149,19 @@ PGPASSWORD=dkgIdIK9d&8 psql -h admin.ydd-club.com -p 5432 -U jane -d meetinginbe
 
 ## 接口限制
 - `/api/activities/` 等列表接口的 `page_size` 最大为 **100**
+
+## 法务页面（2026-03 更新）
+
+- 新增页面：`/privacy-policy`
+- 新增页面：`/terms-of-service`
+- 页脚 `Privacy Policy` 与 `Terms of Service` 链接已指向真实路由
+
+### 服务条款（Terms of Service）新增内容
+- 支持付款方式：美元现金、人民币现金、Wise、Avosend、微信支付、支付宝、人民币银行转账
+- 若客户仅支持 PayPal 等未列出的付款方式，可拒绝接单
+- 联系电话：`86-19910329598`
+
+### 隐私政策（Privacy Policy）新增内容
+- 收集信息范围：姓名、联系方式等必要个人信息
+- 使用目的：订单处理与服务交付
+- 隐私问题联系渠道已补充电话：`86-19910329598`

@@ -1,6 +1,7 @@
 "use client";
 
 import React from "react";
+import Link from "next/link";
 import { useLanguage } from "@/app/providers";
 import { SectionWrapper } from "@/components/section-wrapper";
 import { useCmsSection } from "@/hooks/use-cms-section";
@@ -8,7 +9,7 @@ import { EditableSection } from "@/components/cms/editable-section";
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/components/ui/accordion";
 import { Button } from "@/components/ui/button";
 import Image from "next/image";
-import { CheckCircle2, MessageSquare, Mail } from "lucide-react";
+import { CheckCircle2, MessageSquare, Mail, Phone } from "lucide-react";
 
 export function Footer() {
   const { t } = useLanguage();
@@ -49,6 +50,10 @@ export function Footer() {
               <span>WeChat: {t.contact?.wechat || "jane-cnba"}</span>
             </div>
             <div className="flex items-center gap-3">
+              <Phone className="h-4 w-4 text-accent" />
+              <span>Phone: 86-19910329598</span>
+            </div>
+            <div className="flex items-center gap-3">
               <span className="text-accent">📍</span>
               <span>{t.contact?.location || "Beijing, China"}</span>
             </div>
@@ -72,8 +77,12 @@ export function Footer() {
       <div className="max-w-7xl mx-auto mt-12 pt-8 border-t border-slate-800 text-xs flex flex-col md:flex-row justify-between items-center gap-4">
         <p>© 2026 MeetingInBeijing. All rights reserved.</p>
         <div className="flex gap-6">
-          <a href="#" className="hover:text-white transition-colors">Privacy Policy</a>
-          <a href="#" className="hover:text-white transition-colors">Terms of Service</a>
+          <Link href="/privacy-policy" className="hover:text-white transition-colors">
+            Privacy Policy
+          </Link>
+          <Link href="/terms-of-service" className="hover:text-white transition-colors">
+            Terms of Service
+          </Link>
         </div>
       </div>
     </footer>
