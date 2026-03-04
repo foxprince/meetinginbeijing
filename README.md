@@ -131,6 +131,18 @@ scripts/deploy/deploy-prod.sh "commit message"
 
 ## 已知问题和修复
 
+### 2026-03-04: 博客正文图片在生产环境不显示
+**问题**: 部分博客文章（如带空格或特殊字符 slug 的文章）正文中的图片不显示。
+
+**根本原因**: 博客详情页仅对封面图使用了 OSS 代理地址转换，正文 HTML 里的
+`<img src="https://meetinginbeijing.oss-cn-beijing.aliyuncs.com/...">` 未统一改写为
+`/api/public-image?url=...`，导致生产环境下正文图片直链加载失败。
+
+**修复方案**:
+1. 在 `web/src/app/blog/[slug]/page.tsx` 新增 `rewriteContentImageUrls`。
+2. 渲染正文前，统一将 OSS 公网域名图片 URL 转换为 `/api/public-image` 代理地址。
+3. 保持非 OSS 图片地址原样，避免影响第三方图片。
+
 ### 2026-03-02: Blog 页面 500 错误修复
 **问题**: Blog 页面访问时出现 `ECONNREFUSED` 错误，无法连接到数据库。
 

@@ -51,8 +51,25 @@ function formatDate(dateString: string, lang: string = 'en'): string {
   return date.toLocaleDateString(lang === 'zh' ? 'zh-CN' : 'en-US', options);
 }
 
+function rewriteContentImageUrls(content: string): string {
+  return content.replace(/(<img[^>]*\ssrc=")([^"]+)("[^>]*>)/gi, (
+    _match,
+    prefix,
+    src,
+    suffix
+  ) => {
+    if (!isOssPublicImageUrl(src)) {
+      return `${prefix}${src}${suffix}`;
+    }
+
+    return `${prefix}${toDisplayImageUrl(src)}${suffix}`;
+  });
+}
+
 // 简单的 HTML 内容渲染（支持富文本）
 function renderContent(content: string) {
+  const contentWithDisplayImageUrl = rewriteContentImageUrls(content);
+
   return (
     <div
       className="prose prose-slate max-w-none
@@ -64,7 +81,7 @@ function renderContent(content: string) {
         prose-blockquote:border-l-4 prose-blockquote:border-primary prose-blockquote:bg-secondary/30 prose-blockquote:pl-6 prose-blockquote:py-2 prose-blockquote:italic
         prose-ul:list-disc prose-ul:pl-6 prose-ol:list-decimal prose-ol:pl-6
         prose-li:text-slate-600"
-      dangerouslySetInnerHTML={{ __html: content }}
+      dangerouslySetInnerHTML={{ __html: contentWithDisplayImageUrl }}
     />
   );
 }
