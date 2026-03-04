@@ -69,7 +69,9 @@ export function Navbar() {
     setCmsContent(newContent);
   };
 
-  const nextLang = lang === "en" ? "zh" : "en";
+  const urlLang = searchParams?.get("lang") === "zh" ? "zh" : "en";
+  const activeLang = pathname.startsWith("/blog") ? urlLang : lang;
+  const nextLang = activeLang === "en" ? "zh" : "en";
   const languageSwitchHref = pathname.startsWith("/blog")
     ? (() => {
         const params = new URLSearchParams(searchParams?.toString() || "");
@@ -141,13 +143,13 @@ export function Navbar() {
         </div>
 
         <div className="flex items-center gap-4">
-          <Link
+          <a
             href={languageSwitchHref}
             className="inline-flex items-center gap-2 h-8 px-3 rounded-md text-sm font-medium hover:bg-slate-100 transition-colors"
           >
             <Globe className="h-4 w-4" />
-            <span>{mounted ? (lang === "en" ? "中文" : "EN") : "中文"}</span>
-          </Link>
+            <span>{mounted ? (activeLang === "en" ? "中文" : "EN") : "中文"}</span>
+          </a>
           {mounted && (
             <Button size="sm" className="bg-primary hover:bg-primary/90 text-white hidden sm:flex">
               {ctaText}

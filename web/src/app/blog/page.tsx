@@ -184,7 +184,7 @@ export default async function BlogPage({
                 const isActive = targetPage === currentPage;
 
                 return (
-                  <Link
+                  <a
                     key={targetPage}
                     href={`/blog?${params.toString()}`}
                     className={`inline-flex items-center justify-center h-8 px-3 rounded-md text-sm font-medium transition-colors ${
@@ -194,7 +194,7 @@ export default async function BlogPage({
                     }`}
                   >
                     {targetPage}
-                  </Link>
+                  </a>
                 );
               })}
             </div>

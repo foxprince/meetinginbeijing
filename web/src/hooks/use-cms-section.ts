@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { CmsSectionKey } from '@/types/cms';
 
 interface CmsSectionResponse {
@@ -15,13 +15,15 @@ export function useCmsSection(
   fallback: Record<string, unknown>
 ): Record<string, unknown> {
   const [content, setContent] = useState<Record<string, unknown>>(fallback);
+  const fallbackRef = useRef(fallback);
 
   useEffect(() => {
-    setContent(fallback);
+    fallbackRef.current = fallback;
   }, [fallback]);
 
   useEffect(() => {
     let cancelled = false;
+    setContent(fallbackRef.current);
 
     async function loadCmsContent() {
       try {
