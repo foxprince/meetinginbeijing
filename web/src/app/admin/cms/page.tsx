@@ -7,6 +7,7 @@ import { Label } from '@/components/ui/label';
 import { Textarea } from '@/components/ui/textarea';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { CMS_SECTION_KEYS, CmsSectionKey, CmsSectionRow } from '@/types/cms';
+import { AdminLogoutButton } from '@/components/admin/logout-button';
 
 interface CmsApiResponse {
   sections: CmsSectionRow[];
@@ -199,6 +200,7 @@ export default function AdminCmsPage() {
                 查看前台
               </Button>
             </Link>
+            <AdminLogoutButton variant="outline" size="sm" />
           </div>
         </div>
       </header>

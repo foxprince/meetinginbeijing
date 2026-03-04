@@ -30,12 +30,18 @@ interface BlogListResponse {
   totalPages: number;
 }
 
-async function getBlogPosts(lang: string = 'en'): Promise<BlogListResponse> {
+async function getBlogPosts(lang: string = 'en', page: number = 1): Promise<BlogListResponse> {
   const baseUrl =
     process.env.NEXT_PUBLIC_BASE_URL ||
     process.env.INTERNAL_BASE_URL ||
     'http://127.0.0.1:3003';
-  const res = await fetch(`${baseUrl}/api/blog?lang=${lang}&status=published&page=1&pageSize=12`, {
+  const query = new URLSearchParams({
+    lang,
+    status: 'published',
+    page: String(page),
+    pageSize: '12',
+  });
+  const res = await fetch(`${baseUrl}/api/blog?${query.toString()}`, {
     next: { revalidate: 60 }, // 每分钟重新验证
   });
 
@@ -56,14 +62,32 @@ function formatDate(dateString: string, lang: string = 'en'): string {
   return date.toLocaleDateString(lang === 'zh' ? 'zh-CN' : 'en-US', options);
 }
 
+type BlogSearchParams = {
+  lang?: string | string[];
+  page?: string | string[];
+};
+
+function resolveParam(value: string | string[] | undefined): string | undefined {
+  if (Array.isArray(value)) {
+    return value[0];
+  }
+  return value;
+}
+
 export default async function BlogPage({
   searchParams,
 }: {
-  searchParams: Promise<{ lang?: string }>;
+  searchParams?: BlogSearchParams;
 }) {
-  const { lang = 'en' } = await searchParams;
-  const data = await getBlogPosts(lang);
+  const langParam = resolveParam(searchParams?.lang);
+  const pageParam = resolveParam(searchParams?.page);
+  const lang = langParam === 'zh' ? 'zh' : 'en';
+  const page = Number(pageParam) >= 1 ? Number(pageParam) : 1;
+
+  const data = await getBlogPosts(lang, page);
   const posts = data.posts || [];
+  const totalPages = Math.max(data.totalPages, 1);
+  const currentPage = Math.min(Math.max(data.page, 1), totalPages);
 
   const isZh = lang === 'zh';
 
@@ -144,19 +168,28 @@ export default async function BlogPage({
             </div>
           )}
 
-          {/* Pagination placeholder - can be implemented later */}
-          {data.totalPages > 1 && (
+          {totalPages > 1 && (
             <div className="mt-12 flex justify-center gap-2">
-              {Array.from({ length: data.totalPages }, (_, i) => (
-                <Button
-                  key={i + 1}
-                  variant={i + 1 === data.page ? 'default' : 'outline'}
-                  size="sm"
-                  className={i + 1 === data.page ? 'bg-primary' : ''}
-                >
-                  {i + 1}
-                </Button>
-              ))}
+              {Array.from({ length: totalPages }, (_, index) => {
+                const targetPage = index + 1;
+                const params = new URLSearchParams();
+                params.set('page', String(targetPage));
+                params.set('lang', lang);
+
+                return (
+                  <Button
+                    key={targetPage}
+                    variant={targetPage === currentPage ? 'default' : 'outline'}
+                    size="sm"
+                    className={targetPage === currentPage ? 'bg-primary' : ''}
+                    asChild
+                  >
+                    <Link href={`/blog?${params.toString()}`} scroll={false}>
+                      {targetPage}
+                    </Link>
+                  </Button>
+                );
+              })}
             </div>
           )}
         </div>

@@ -17,6 +17,10 @@ export function useCmsSection(
   const [content, setContent] = useState<Record<string, unknown>>(fallback);
 
   useEffect(() => {
+    setContent(fallback);
+  }, [fallback]);
+
+  useEffect(() => {
     let cancelled = false;
 
     async function loadCmsContent() {
@@ -42,7 +46,6 @@ export function useCmsSection(
       }
     }
 
-    setContent(fallback);
     loadCmsContent();
 
     return () => {

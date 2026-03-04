@@ -2,7 +2,7 @@
 
 import React from "react";
 import Link from "next/link";
-import { usePathname } from "next/navigation";
+import { usePathname, useRouter, useSearchParams } from "next/navigation";
 import { useLanguage } from "@/app/providers";
 import { Button } from "@/components/ui/button";
 import { useCmsSection } from "@/hooks/use-cms-section";
@@ -12,6 +12,8 @@ import { Globe } from "lucide-react";
 
 export function Navbar() {
   const pathname = usePathname();
+  const router = useRouter();
+  const searchParams = useSearchParams();
   const { lang, toggleLanguage, t } = useLanguage();
   const isAdmin = useAdminSession();
   const isHomePage = pathname === '/';
@@ -66,6 +68,18 @@ export function Navbar() {
     setCmsContent(newContent);
   };
 
+  const handleLanguageToggle = () => {
+    const nextLang = lang === "en" ? "zh" : "en";
+    toggleLanguage();
+
+    if (pathname.startsWith("/blog")) {
+      const params = new URLSearchParams(searchParams?.toString() || "");
+      params.set("lang", nextLang);
+      params.delete("page");
+      router.push(`${pathname}?${params.toString()}`);
+    }
+  };
+
   return (
     <nav className="sticky top-0 z-50 w-full border-b bg-white/90 backdrop-blur-lg">
       <div className="max-w-7xl mx-auto px-6 md:px-12 flex h-28 items-center justify-between gap-6">
@@ -115,7 +129,7 @@ export function Navbar() {
           <Link href={isHomePage ? "#how-it-works" : "/#how-it-works"} className="text-sm font-medium hover:text-primary transition-colors">
             {t.nav.howItWorks}
           </Link>
-          <Link href="/blog" className="text-sm font-medium hover:text-primary transition-colors">
+          <Link href={`/blog?lang=${lang}`} className="text-sm font-medium hover:text-primary transition-colors">
             {t.nav.blog}
           </Link>
           <Link href={isHomePage ? "#contact" : "/#contact"} className="text-sm font-medium hover:text-primary transition-colors">
@@ -127,7 +141,7 @@ export function Navbar() {
           <Button
             variant="ghost"
             size="sm"
-            onClick={toggleLanguage}
+            onClick={handleLanguageToggle}
             className="flex items-center gap-2"
           >
             <Globe className="h-4 w-4" />

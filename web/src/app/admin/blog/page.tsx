@@ -31,6 +31,7 @@ import {
 } from '@/components/ui/dialog';
 import { Plus, Pencil, Trash2, Eye, Search, Calendar, ImageIcon, Upload } from 'lucide-react';
 import { BlogPost, CreateBlogPostRequest } from '@/types/blog';
+import { AdminLogoutButton } from '@/components/admin/logout-button';
 
 interface BlogListItem {
   id: number;
@@ -43,13 +44,15 @@ interface BlogListItem {
   author: string;
 }
 
+type ImageTarget = 'content_en' | 'content_zh' | 'cover_image';
+
 export default function AdminBlogPage() {
   const [posts, setPosts] = useState<BlogListItem[]>([]);
   const [loading, setLoading] = useState(true);
   const [searchQuery, setSearchQuery] = useState('');
   const [isCreateDialogOpen, setIsCreateDialogOpen] = useState(false);
   const [editingPost, setEditingPost] = useState<BlogPost | null>(null);
-  const [activeTextarea, setActiveTextarea] = useState<'en' | 'zh'>('en');
+  const [activeImageTarget, setActiveImageTarget] = useState<ImageTarget>('content_en');
   const [isImageDialogOpen, setIsImageDialogOpen] = useState(false);
   const [selectedFile, setSelectedFile] = useState<File | null>(null);
   const [imageAlt, setImageAlt] = useState('');
@@ -91,8 +94,8 @@ export default function AdminBlogPage() {
     }
   };
 
-  const openImageDialog = (lang: 'en' | 'zh') => {
-    setActiveTextarea(lang);
+  const openImageDialog = (target: ImageTarget) => {
+    setActiveImageTarget(target);
     setSelectedFile(null);
     setImageAlt('');
     setUploadError('');
@@ -134,7 +137,11 @@ export default function AdminBlogPage() {
       }
 
       const data = await res.json();
-      handleImageInsert(data.url, imageAlt || selectedFile.name);
+      if (activeImageTarget === 'cover_image') {
+        setFormData((prev) => ({ ...prev, cover_image: data.url }));
+      } else {
+        handleImageInsert(data.url, imageAlt || selectedFile.name, activeImageTarget);
+      }
       setIsImageDialogOpen(false);
       setSelectedFile(null);
       setImageAlt('');
@@ -242,8 +249,8 @@ export default function AdminBlogPage() {
     }
   };
 
-  const handleImageInsert = (url: string, alt: string) => {
-    const textarea = activeTextarea === 'en' ? enTextareaRef.current : zhTextareaRef.current;
+  const handleImageInsert = (url: string, alt: string, target: Extract<ImageTarget, 'content_en' | 'content_zh'>) => {
+    const textarea = target === 'content_en' ? enTextareaRef.current : zhTextareaRef.current;
     if (!textarea) return;
 
     const start = textarea.selectionStart;
@@ -252,7 +259,7 @@ export default function AdminBlogPage() {
 
     const newText = text.substring(0, start) + imageTag + text.substring(start);
 
-    if (activeTextarea === 'en') {
+    if (target === 'content_en') {
       setFormData((prev) => ({ ...prev, content_en: newText }));
     } else {
       setFormData((prev) => ({ ...prev, content_zh: newText }));
@@ -319,6 +326,7 @@ export default function AdminBlogPage() {
                 View Blog
               </Button>
             </Link>
+            <AdminLogoutButton variant="outline" size="sm" />
           </div>
         </div>
       </header>
@@ -526,7 +534,7 @@ interface BlogFormProps {
   isEditing?: boolean;
   enTextareaRef?: React.RefObject<HTMLTextAreaElement | null>;
   zhTextareaRef?: React.RefObject<HTMLTextAreaElement | null>;
-  onImageClick?: (lang: 'en' | 'zh') => void;
+  onImageClick?: (target: ImageTarget) => void;
 }
 
 function BlogForm({ formData, setFormData, onSubmit, onCancel, isEditing, enTextareaRef, zhTextareaRef, onImageClick }: BlogFormProps) {
@@ -609,13 +617,44 @@ function BlogForm({ formData, setFormData, onSubmit, onCancel, isEditing, enText
 
       {/* Cover Image */}
       <div className="space-y-2">
-        <Label htmlFor="cover_image">Cover Image URL</Label>
-        <Input
-          id="cover_image"
-          value={formData.cover_image}
-          onChange={(e) => setFormData({ ...formData, cover_image: e.target.value })}
-          placeholder="https://example.com/image.jpg"
-        />
+        <Label htmlFor="cover_image">Cover Image</Label>
+        <div className="flex gap-2">
+          <Input
+            id="cover_image"
+            value={formData.cover_image}
+            onChange={(e) => setFormData({ ...formData, cover_image: e.target.value })}
+            placeholder="https://example.com/image.jpg"
+          />
+          <Button
+            type="button"
+            variant="outline"
+            onClick={() => onImageClick?.('cover_image')}
+            className="shrink-0"
+          >
+            <Upload className="w-4 h-4 mr-1" />
+            上传
+          </Button>
+        </div>
+        {formData.cover_image && (
+          <div className="flex items-center gap-3 rounded-lg border border-slate-200 bg-slate-50 p-3">
+            <div className="w-24 h-16 rounded-md overflow-hidden bg-white border border-slate-100">
+              <img
+                src={formData.cover_image}
+                alt="封面预览"
+                className="w-full h-full object-cover"
+              />
+            </div>
+            <p className="flex-1 text-xs text-slate-600 break-all">{formData.cover_image}</p>
+            <Button
+              type="button"
+              variant="ghost"
+              size="sm"
+              onClick={() => setFormData({ ...formData, cover_image: '' })}
+            >
+              清除
+            </Button>
+          </div>
+        )}
       </div>
 
       {/* English Excerpt */}
@@ -657,7 +696,12 @@ function BlogForm({ formData, setFormData, onSubmit, onCancel, isEditing, enText
           <button type="button" onClick={() => insertTag('<ol>\n  <li>', '</li>\n</ol>', 'en')} className="px-2 py-1 text-sm font-medium text-slate-700 hover:bg-white hover:shadow-sm rounded transition-all" title="Ordered List">OL</button>
           <button type="button" onClick={() => insertTag('<a href="">', '</a>', 'en')} className="px-2 py-1 text-sm font-medium text-slate-700 hover:bg-white hover:shadow-sm rounded transition-all" title="Link">Link</button>
           <div className="w-px h-6 bg-slate-300 mx-1" />
-          <button type="button" onClick={() => onImageClick?.('en')} className="flex items-center gap-1 px-2 py-1 text-sm font-medium text-slate-700 hover:bg-white hover:shadow-sm rounded transition-all" title="Insert Image">
+          <button
+            type="button"
+            onClick={() => onImageClick?.('content_en')}
+            className="flex items-center gap-1 px-2 py-1 text-sm font-medium text-slate-700 hover:bg-white hover:shadow-sm rounded transition-all"
+            title="Insert Image"
+          >
             <ImageIcon className="w-4 h-4" />
             Image
           </button>
@@ -689,7 +733,12 @@ function BlogForm({ formData, setFormData, onSubmit, onCancel, isEditing, enText
           <button type="button" onClick={() => insertTag('<ol>\n  <li>', '</li>\n</ol>', 'zh')} className="px-2 py-1 text-sm font-medium text-slate-700 hover:bg-white hover:shadow-sm rounded transition-all" title="Ordered List">OL</button>
           <button type="button" onClick={() => insertTag('<a href="">', '</a>', 'zh')} className="px-2 py-1 text-sm font-medium text-slate-700 hover:bg-white hover:shadow-sm rounded transition-all" title="Link">Link</button>
           <div className="w-px h-6 bg-slate-300 mx-1" />
-          <button type="button" onClick={() => onImageClick?.('zh')} className="flex items-center gap-1 px-2 py-1 text-sm font-medium text-slate-700 hover:bg-white hover:shadow-sm rounded transition-all" title="Insert Image">
+          <button
+            type="button"
+            onClick={() => onImageClick?.('content_zh')}
+            className="flex items-center gap-1 px-2 py-1 text-sm font-medium text-slate-700 hover:bg-white hover:shadow-sm rounded transition-all"
+            title="Insert Image"
+          >
             <ImageIcon className="w-4 h-4" />
             Image
           </button>

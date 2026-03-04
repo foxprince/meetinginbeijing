@@ -140,7 +140,7 @@ export function Testimonials() {
       <div className="grid grid-cols-1 md:grid-cols-2 gap-8 max-w-5xl mx-auto">
         {items.map((item, index) => (
           <div key={index} className="bg-white p-8 rounded-2xl shadow-sm border border-slate-100 relative">
-            <div className="text-4xl text-secondary absolute top-4 left-4 font-serif">"</div>
+            <div className="text-4xl text-secondary absolute top-4 left-4 font-serif">&ldquo;</div>
             <p className="text-lg text-slate-700 italic mb-6 relative z-10 leading-relaxed">
               {item.text}
             </p>

@@ -62,7 +62,7 @@ function normalizeSlug(originalSlug: string, title: string, id: number): string 
   if (candidate) {
     try {
       candidate = decodeURIComponent(candidate);
-    } catch (error) {
+    } catch (_error) {
       // ignore decode errors and fall back later
     }
   }
@@ -156,7 +156,7 @@ async function fetchWpPosts(): Promise<WPPost[]> {
   return posts;
 }
 
-function getImageCandidate($img: cheerio.Cheerio<any>): string | null {
+function getImageCandidate($img: cheerio.Cheerio<cheerio.Element>): string | null {
   const candidates = [
     $img.attr("data-src"),
     $img.attr("data-lazy-src"),

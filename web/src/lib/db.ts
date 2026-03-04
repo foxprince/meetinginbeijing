@@ -1,4 +1,5 @@
 import { Pool } from 'pg';
+import type { PoolConfig } from 'pg';
 import * as fs from 'fs';
 import * as path from 'path';
 
@@ -25,7 +26,7 @@ if (process.env.NODE_ENV === 'production' && !process.env.POSTGRES_URL) {
   }
 }
 
-let connectionString = process.env.POSTGRES_URL;
+const connectionString = process.env.POSTGRES_URL;
 
 if (!connectionString) {
   throw new Error('POSTGRES_URL is not set');
@@ -35,7 +36,7 @@ if (!connectionString) {
 process.env.NODE_TLS_REJECT_UNAUTHORIZED = '0';
 
 // 解析连接字符串，正确处理 URL 编码的密码
-let poolConfig: any = {
+let poolConfig: PoolConfig = {
   connectionString,
   ssl: {
     rejectUnauthorized: false,
@@ -60,7 +61,7 @@ try {
     };
   }
 } catch (error) {
-  console.warn('Failed to parse connection string, using as-is');
+  console.warn('Failed to parse connection string, using as-is', error);
 }
 
 const pool = new Pool(poolConfig);

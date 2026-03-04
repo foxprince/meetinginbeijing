@@ -14,17 +14,33 @@ interface LanguageContextProps {
 
 const LanguageContext = createContext<LanguageContextProps | undefined>(undefined);
 
+function getPreferredLanguage(): Language {
+  if (typeof window === "undefined") {
+    return "en";
+  }
+
+  const savedLang = window.localStorage.getItem("lang") as Language | null;
+  if (savedLang === "en" || savedLang === "zh") {
+    return savedLang;
+  }
+
+  return window.navigator.language.startsWith("zh") ? "zh" : "en";
+}
+
 function LanguageProvider({ children }: { children: ReactNode }): React.JSX.Element {
-  const [lang, setLang] = useState<Language>("en");
+  const [lang, setLang] = useState<Language>(() => getPreferredLanguage());
 
   useEffect(() => {
-    const savedLang = localStorage.getItem("lang") as Language | null;
-    if (savedLang && (savedLang === "en" || savedLang === "zh")) {
-      setLang(savedLang);
-    } else if (navigator.language.startsWith("zh")) {
-      setLang("zh");
+    if (typeof window === "undefined") {
+      return;
     }
-  }, []);
+
+    const savedLang = window.localStorage.getItem("lang") as Language | null;
+    if (savedLang && (savedLang === "en" || savedLang === "zh") && savedLang !== lang) {
+      // eslint-disable-next-line react-hooks/set-state-in-effect
+      setLang(savedLang);
+    }
+  }, [lang]);
 
   const toggleLanguage = () => {
     const newLang = lang === "en" ? "zh" : "en";
@@ -34,10 +50,10 @@ function LanguageProvider({ children }: { children: ReactNode }): React.JSX.Elem
 
   const t = content[lang];
 
-  return React.createElement(
-    LanguageContext.Provider,
-    { value: { lang, toggleLanguage, t } },
-    children
+  return (
+    <LanguageContext.Provider value={{ lang, toggleLanguage, t }}>
+      {children}
+    </LanguageContext.Provider>
   );
 }
 
@@ -50,5 +66,5 @@ export function useLanguage() {
 }
 
 export function Providers({ children }: { children: ReactNode }): React.JSX.Element {
-  return React.createElement(LanguageProvider, { children });
+  return <LanguageProvider>{children}</LanguageProvider>;
 }
