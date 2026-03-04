@@ -1,3 +1,4 @@
+import { Suspense } from "react";
 import { Navbar } from "@/components/navbar";
 import { Hero } from "@/components/sections/hero";
 import { WhoIHelp } from "@/components/sections/who-i-help";
@@ -11,7 +12,9 @@ import { ContactForm } from "@/components/sections/contact-form";
 export default function Home() {
   return (
     <main className="min-h-screen">
-      <Navbar />
+      <Suspense fallback={<div className="h-28 w-full" />}>
+        <Navbar />
+      </Suspense>
       <Hero />
       <WhoIHelp />
       <Services />
