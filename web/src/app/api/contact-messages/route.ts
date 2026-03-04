@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import { ensureContactMessagesTable, getDbClient } from "@/lib/db";
+import { sendNewMessageSms } from "@/lib/sms";
 import { CreateContactMessageRequest } from "@/types/contact-message";
 
 function trimText(value: unknown, maxLength: number): string {
@@ -20,6 +21,21 @@ function normalizePreferredDate(value: unknown): string | null {
     return null;
   }
   return trimmed;
+}
+
+function formatMessageTime(dateInput: string | Date): string {
+  const date = dateInput instanceof Date ? dateInput : new Date(dateInput);
+
+  return new Intl.DateTimeFormat("zh-CN", {
+    timeZone: "Asia/Shanghai",
+    year: "numeric",
+    month: "2-digit",
+    day: "2-digit",
+    hour: "2-digit",
+    minute: "2-digit",
+    second: "2-digit",
+    hour12: false,
+  }).format(date);
 }
 
 export async function POST(request: NextRequest) {
@@ -64,11 +80,28 @@ export async function POST(request: NextRequest) {
         ]
       );
 
+      const createdAt = result.rows[0].created_at as string;
+      let smsNotified = true;
+      let smsError = "";
+
+      try {
+        await sendNewMessageSms({
+          name,
+          time: formatMessageTime(createdAt),
+        });
+      } catch (error) {
+        smsNotified = false;
+        smsError = error instanceof Error ? error.message : "SMS notify failed";
+        console.error("Failed to send new message SMS notification:", error);
+      }
+
       return NextResponse.json(
         {
           success: true,
           id: result.rows[0].id,
-          created_at: result.rows[0].created_at,
+          created_at: createdAt,
+          sms_notified: smsNotified,
+          sms_error: smsError || undefined,
         },
         { status: 201 }
       );

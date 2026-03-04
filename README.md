@@ -55,6 +55,20 @@ MeetingInBeijing 是一个为在北京生活和工作的人提供信息和资源
   - `PATCH /api/admin/contact-messages/:id`
   - `DELETE /api/admin/contact-messages/:id`
 
+### 留言短信通知（阿里云短信）
+- 触发时机：前台留言创建成功后自动发送
+- 模板 ID：`SMS_501785871`
+- 模板变量：`time`、`name`
+- 短信内容：`您有新的留言,时间:${time},留言者:${name}`
+
+#### 需要配置的环境变量（`/home/app/git/meetinginbeijing/web/.env`）
+- `ALIYUN_SMS_ACCESS_KEY_ID`
+- `ALIYUN_SMS_ACCESS_KEY_SECRET`
+- `ALIYUN_SMS_SIGN_NAME`
+- `ALIYUN_SMS_RECEIVER_PHONE`
+- `ALIYUN_SMS_TEMPLATE_CODE`（可选，默认 `SMS_501785871`）
+- `ALIYUN_SMS_ENDPOINT`（可选，默认 `dysmsapi.aliyuncs.com`）
+
 ### 数据表
 - 新增表：`contact_messages`
 - 状态枚举：`new`、`processing`、`resolved`
