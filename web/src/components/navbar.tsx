@@ -70,17 +70,19 @@ export function Navbar() {
     setCmsContent(newContent);
   };
 
-  const handleLanguageToggle = () => {
-    const nextLang = lang === "en" ? "zh" : "en";
-    toggleLanguage();
+  const nextLang = lang === "en" ? "zh" : "en";
+  const languageSwitchHref = pathname.startsWith("/blog")
+    ? (() => {
+        const params = new URLSearchParams(searchParams?.toString() || "");
+        params.set("lang", nextLang);
+        params.delete("page");
+        return `${pathname}?${params.toString()}`;
+      })()
+    : pathname;
 
-    if (pathname.startsWith("/blog")) {
-      const params = new URLSearchParams(searchParams?.toString() || "");
-      params.set("lang", nextLang);
-      params.delete("page");
-      router.push(`${pathname}?${params.toString()}`);
-      router.refresh();
-    } else {
+  const handleLanguageClick = () => {
+    toggleLanguage();
+    if (!pathname.startsWith("/blog")) {
       router.refresh();
     }
   };
@@ -147,15 +149,14 @@ export function Navbar() {
         </div>
 
         <div className="flex items-center gap-4">
-          <Button
-            variant="ghost"
-            size="sm"
-            onClick={handleLanguageToggle}
-            className="flex items-center gap-2"
+          <Link
+            href={languageSwitchHref}
+            onClick={handleLanguageClick}
+            className="inline-flex items-center gap-2 h-8 px-3 rounded-md text-sm font-medium hover:bg-slate-100 transition-colors"
           >
             <Globe className="h-4 w-4" />
             <span>{mounted ? (lang === "en" ? "中文" : "EN") : "中文"}</span>
-          </Button>
+          </Link>
           {mounted && (
             <Button size="sm" className="bg-primary hover:bg-primary/90 text-white hidden sm:flex">
               {ctaText}
