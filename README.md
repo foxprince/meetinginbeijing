@@ -174,6 +174,7 @@ PGPASSWORD=dkgIdIK9d&8 psql -h admin.ydd-club.com -p 5432 -U jane -d meetinginbe
 - 新增页面：`/privacy-policy`
 - 新增页面：`/terms-of-service`
 - 页脚 `Privacy Policy` 与 `Terms of Service` 链接已指向真实路由
+- 两页内容已升级为完整中英文条款（含生效日期、支付规则、责任限制、争议解决等）
 
 ### 服务条款（Terms of Service）新增内容
 - 支持付款方式：美元现金、人民币现金、Wise、Avosend、微信支付、支付宝、人民币银行转账
