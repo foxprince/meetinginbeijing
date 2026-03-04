@@ -12,6 +12,8 @@ export const metadata: Metadata = {
   description: 'Insights, tips, and stories about living and doing business in Beijing.',
 };
 
+export const revalidate = 0;
+
 interface BlogPost {
   id: number;
   slug: string;
@@ -43,7 +45,7 @@ async function getBlogPosts(lang: string = 'en', page: number = 1): Promise<Blog
     pageSize: '12',
   });
   const res = await fetch(`${baseUrl}/api/blog?${query.toString()}`, {
-    next: { revalidate: 60 }, // 每分钟重新验证
+    cache: 'no-store',
   });
 
   if (!res.ok) {
