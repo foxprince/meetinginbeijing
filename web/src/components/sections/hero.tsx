@@ -10,6 +10,7 @@ import { CheckCircle2 } from "lucide-react";
 
 export function Hero() {
   const { lang, t } = useLanguage();
+  const [mounted, setMounted] = React.useState(false);
   const cmsFallback = {
     title: t.hero.title,
     subtitle: t.hero.subtitle,
@@ -23,6 +24,7 @@ export function Hero() {
   const fetchedContent = useCmsSection("hero", lang, cmsFallback);
 
   React.useEffect(() => {
+    setMounted(true);
     setCmsContent(fetchedContent);
   }, [fetchedContent]);
 
@@ -71,6 +73,10 @@ export function Hero() {
       throw error;
     }
   };
+
+  if (!mounted) {
+    return <section className="relative overflow-hidden bg-white pt-16 pb-24 md:pt-24 md:pb-32 px-6 md:px-12"><div className="h-96" /></section>;
+  }
 
   return (
     <section className="relative overflow-hidden bg-white pt-16 pb-24 md:pt-24 md:pb-32 px-6 md:px-12">
