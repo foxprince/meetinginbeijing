@@ -40,6 +40,25 @@ MeetingInBeijing 是一个为在北京生活和工作的人提供信息和资源
 - `POST /api/admin/cms`：后台发布区块
 - `GET /api/cms/section?key=...&lang=en|zh`：前台读取已发布内容
 
+## 留言功能（2026-03 更新）
+
+### 前台
+- 首页联系表单已接入留言提交
+- 提交接口：`POST /api/contact-messages`
+- 字段：`name`、`country`、`contact`、`service_type`、`preferred_date`、`message`
+
+### 后台管理
+- 新增管理页面：`/admin/messages`
+- 可按状态筛选、关键词搜索、更新留言状态、填写管理员备注、删除留言
+- 后台接口：
+  - `GET /api/admin/contact-messages`
+  - `PATCH /api/admin/contact-messages/:id`
+  - `DELETE /api/admin/contact-messages/:id`
+
+### 数据表
+- 新增表：`contact_messages`
+- 状态枚举：`new`、`processing`、`resolved`
+
 ### 前台内联编辑（所见即所得）
 管理员登录后访问前台页面时，可直接编辑内容：
 

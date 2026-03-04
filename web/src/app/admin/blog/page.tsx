@@ -320,6 +320,11 @@ export default function AdminBlogPage() {
                 CMS
               </Button>
             </Link>
+            <Link href="/admin/messages">
+              <Button variant="outline" size="sm">
+                留言管理
+              </Button>
+            </Link>
             <Link href="/blog">
               <Button variant="ghost" size="sm">
                 <Eye className="w-4 h-4 mr-2" />

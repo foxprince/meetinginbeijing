@@ -73,6 +73,36 @@ export async function getDbClient() {
   return pool.connect();
 }
 
+export async function ensureContactMessagesTable(): Promise<void> {
+  const client = await getDbClient();
+  try {
+    await client.query(`
+      CREATE TABLE IF NOT EXISTS contact_messages (
+        id SERIAL PRIMARY KEY,
+        name VARCHAR(120) NOT NULL,
+        country VARCHAR(120),
+        contact VARCHAR(255) NOT NULL,
+        service_type VARCHAR(255),
+        preferred_date DATE,
+        message TEXT NOT NULL,
+        status VARCHAR(20) NOT NULL DEFAULT 'new',
+        admin_note TEXT,
+        created_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP,
+        updated_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP
+      );
+    `);
+
+    await client.query(
+      'CREATE INDEX IF NOT EXISTS idx_contact_messages_status ON contact_messages(status);'
+    );
+    await client.query(
+      'CREATE INDEX IF NOT EXISTS idx_contact_messages_created_at ON contact_messages(created_at DESC);'
+    );
+  } finally {
+    client.release();
+  }
+}
+
 // 初始化数据库表
 export async function initDb() {
   const client = await getDbClient();
@@ -102,6 +132,22 @@ export async function initDb() {
   `);
 
   await client.query(`
+    CREATE TABLE IF NOT EXISTS contact_messages (
+      id SERIAL PRIMARY KEY,
+      name VARCHAR(120) NOT NULL,
+      country VARCHAR(120),
+      contact VARCHAR(255) NOT NULL,
+      service_type VARCHAR(255),
+      preferred_date DATE,
+      message TEXT NOT NULL,
+      status VARCHAR(20) NOT NULL DEFAULT 'new',
+      admin_note TEXT,
+      created_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP,
+      updated_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP
+    );
+  `);
+
+  await client.query(`
     CREATE TABLE IF NOT EXISTS cms_sections (
       section_key VARCHAR(100) PRIMARY KEY,
       draft_content_en JSONB NOT NULL DEFAULT '{}'::jsonb,
@@ -120,6 +166,8 @@ export async function initDb() {
   await client.query('CREATE INDEX IF NOT EXISTS idx_blog_posts_published_at ON blog_posts(published_at DESC);');
   await client.query('CREATE INDEX IF NOT EXISTS idx_blog_posts_slug ON blog_posts(slug);');
   await client.query('CREATE INDEX IF NOT EXISTS idx_cms_sections_status ON cms_sections(status);');
+  await client.query('CREATE INDEX IF NOT EXISTS idx_contact_messages_status ON contact_messages(status);');
+  await client.query('CREATE INDEX IF NOT EXISTS idx_contact_messages_created_at ON contact_messages(created_at DESC);');
 
   client.release();
   console.log('Database initialized successfully');

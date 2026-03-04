@@ -195,6 +195,11 @@ export default function AdminCmsPage() {
                 Blog 管理
               </Button>
             </Link>
+            <Link href="/admin/messages">
+              <Button variant="outline" size="sm">
+                留言管理
+              </Button>
+            </Link>
             <Link href="/" target="_blank">
               <Button variant="ghost" size="sm">
                 查看前台
