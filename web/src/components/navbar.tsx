@@ -24,9 +24,11 @@ export function Navbar() {
   };
 
   const [cmsContent, setCmsContent] = React.useState<Record<string, unknown>>(cmsFallback);
+  const [mounted, setMounted] = React.useState(false);
   const fetchedContent = useCmsSection("navbar", lang, cmsFallback);
 
   React.useEffect(() => {
+    setMounted(true);
     setCmsContent(fetchedContent);
   }, [fetchedContent]);
   const brandTitle =
@@ -145,7 +147,7 @@ export function Navbar() {
             className="flex items-center gap-2"
           >
             <Globe className="h-4 w-4" />
-            <span>{lang === "en" ? "中文" : "EN"}</span>
+            <span>{mounted ? (lang === "en" ? "中文" : "EN") : "中文"}</span>
           </Button>
           <Button size="sm" className="bg-primary hover:bg-primary/90 text-white hidden sm:flex">
             {ctaText}
