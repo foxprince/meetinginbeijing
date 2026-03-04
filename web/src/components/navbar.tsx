@@ -2,7 +2,7 @@
 
 import React from "react";
 import Link from "next/link";
-import { usePathname, useRouter, useSearchParams } from "next/navigation";
+import { usePathname, useSearchParams } from "next/navigation";
 import { useLanguage } from "@/app/providers";
 import { Button } from "@/components/ui/button";
 import { useCmsSection } from "@/hooks/use-cms-section";
@@ -12,9 +12,8 @@ import { Globe } from "lucide-react";
 
 export function Navbar() {
   const pathname = usePathname();
-  const router = useRouter();
   const searchParams = useSearchParams();
-  const { lang, toggleLanguage, t } = useLanguage();
+  const { lang, t } = useLanguage();
   const isAdmin = useAdminSession();
   const isHomePage = pathname === '/';
   const cmsFallback = {
@@ -78,14 +77,7 @@ export function Navbar() {
         params.delete("page");
         return `${pathname}?${params.toString()}`;
       })()
-    : pathname;
-
-  const handleLanguageClick = () => {
-    toggleLanguage();
-    if (!pathname.startsWith("/blog")) {
-      router.refresh();
-    }
-  };
+    : `${pathname}?lang=${nextLang}`;
 
   return (
     <nav className="sticky top-0 z-50 w-full border-b bg-white/90 backdrop-blur-lg">
@@ -151,7 +143,6 @@ export function Navbar() {
         <div className="flex items-center gap-4">
           <Link
             href={languageSwitchHref}
-            onClick={handleLanguageClick}
             className="inline-flex items-center gap-2 h-8 px-3 rounded-md text-sm font-medium hover:bg-slate-100 transition-colors"
           >
             <Globe className="h-4 w-4" />
