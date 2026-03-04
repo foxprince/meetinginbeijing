@@ -5,7 +5,7 @@ import { notFound } from 'next/navigation';
 import { Navbar } from '@/components/navbar';
 import { Footer } from '@/components/sections/footer-faq-cta';
 import { Button } from '@/components/ui/button';
-import { isOssPublicImageUrl } from '@/lib/image';
+import { isOssPublicImageUrl, toDisplayImageUrl } from '@/lib/image';
 import { Calendar, ArrowLeft, User, Share2 } from 'lucide-react';
 
 interface BlogPost {
@@ -151,7 +151,7 @@ export default async function BlogPostPage({
         {post.cover_image && (
           <div className="relative w-full h-64 md:h-96 rounded-2xl overflow-hidden mb-10 shadow-lg">
             <Image
-              src={post.cover_image}
+              src={toDisplayImageUrl(post.cover_image)}
               alt={post.title}
               fill
               unoptimized={isOssPublicImageUrl(post.cover_image)}

@@ -5,7 +5,7 @@ import { Suspense } from 'react';
 import { Navbar } from '@/components/navbar';
 import { Footer } from '@/components/sections/footer-faq-cta';
 import { Button } from '@/components/ui/button';
-import { isOssPublicImageUrl } from '@/lib/image';
+import { isOssPublicImageUrl, toDisplayImageUrl } from '@/lib/image';
 import { Calendar, ArrowRight, User } from 'lucide-react';
 
 export const metadata: Metadata = {
@@ -136,7 +136,7 @@ export default async function BlogPage({
                     <div className="relative h-48 overflow-hidden">
                       {post.cover_image ? (
                         <Image
-                          src={post.cover_image}
+                          src={toDisplayImageUrl(post.cover_image)}
                           alt={post.title}
                           fill
                           unoptimized={isOssPublicImageUrl(post.cover_image)}

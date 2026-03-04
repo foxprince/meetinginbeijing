@@ -4,7 +4,7 @@ import { useState } from 'react';
 import { Upload, X } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { useAdminSession } from '@/hooks/use-admin-session';
-import { isOssPublicImageUrl } from '@/lib/image';
+import { isOssPublicImageUrl, toDisplayImageUrl } from '@/lib/image';
 import Image from 'next/image';
 
 interface EditableImageProps {
@@ -87,7 +87,7 @@ export function EditableImage({
     return (
       <div className={`${aspectClasses[aspectRatio]} relative rounded-3xl overflow-hidden ${className}`}>
         <Image
-          src={displayUrl}
+          src={toDisplayImageUrl(displayUrl)}
           alt={alt}
           fill
           unoptimized={isOssPublicImageUrl(displayUrl)}
@@ -102,7 +102,7 @@ export function EditableImage({
       {displayUrl ? (
         <div className="relative w-full h-full rounded-3xl overflow-hidden">
           <Image
-            src={displayUrl}
+            src={toDisplayImageUrl(displayUrl)}
             alt={alt}
             fill
             unoptimized={isOssPublicImageUrl(displayUrl)}

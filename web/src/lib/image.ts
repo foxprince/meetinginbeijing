@@ -8,3 +8,12 @@ export function isOssPublicImageUrl(url: string): boolean {
     return false;
   }
 }
+
+export function toDisplayImageUrl(url: string): string {
+  if (!isOssPublicImageUrl(url)) {
+    return url;
+  }
+
+  const encodedUrl = encodeURIComponent(url);
+  return `/api/public-image?url=${encodedUrl}`;
+}
