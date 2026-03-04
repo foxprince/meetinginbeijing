@@ -181,19 +181,20 @@ export default async function BlogPage({
                 const params = new URLSearchParams();
                 params.set('page', String(targetPage));
                 params.set('lang', lang);
+                const isActive = targetPage === currentPage;
 
                 return (
-                  <Button
+                  <Link
                     key={targetPage}
-                    variant={targetPage === currentPage ? 'default' : 'outline'}
-                    size="sm"
-                    className={targetPage === currentPage ? 'bg-primary' : ''}
-                    asChild
+                    href={`/blog?${params.toString()}`}
+                    className={`inline-flex items-center justify-center h-8 px-3 rounded-md text-sm font-medium transition-colors ${
+                      isActive
+                        ? 'bg-primary text-white'
+                        : 'border bg-white hover:bg-slate-100'
+                    }`}
                   >
-                    <Link href={`/blog?${params.toString()}`} scroll={false}>
-                      {targetPage}
-                    </Link>
-                  </Button>
+                    {targetPage}
+                  </Link>
                 );
               })}
             </div>

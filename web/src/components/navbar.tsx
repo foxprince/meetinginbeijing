@@ -79,6 +79,9 @@ export function Navbar() {
       params.set("lang", nextLang);
       params.delete("page");
       router.push(`${pathname}?${params.toString()}`);
+      router.refresh();
+    } else {
+      router.refresh();
     }
   };
 
