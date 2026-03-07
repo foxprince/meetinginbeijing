@@ -4,7 +4,6 @@ import React from "react";
 import Link from "next/link";
 import { usePathname, useSearchParams } from "next/navigation";
 import { useLanguage } from "@/app/providers";
-import { Button } from "@/components/ui/button";
 import { useCmsSection } from "@/hooks/use-cms-section";
 import { useAdminSession } from "@/hooks/use-admin-session";
 import { EditableText } from "@/components/cms/editable-text";
@@ -19,7 +18,6 @@ export function Navbar() {
   const cmsFallback = {
     brand_title: "MeetingInBeijing",
     brand_subtitle: "Your Beijing Companion",
-    cta_text: t.nav.cta,
   };
 
   const [cmsContent, setCmsContent] = React.useState<Record<string, unknown>>(cmsFallback);
@@ -38,10 +36,6 @@ export function Navbar() {
     typeof cmsContent.brand_subtitle === "string"
       ? cmsContent.brand_subtitle
       : cmsFallback.brand_subtitle;
-  const ctaText =
-    typeof cmsContent.cta_text === "string"
-      ? cmsContent.cta_text
-      : cmsFallback.cta_text;
 
   const handleSave = async (field: string, value: string) => {
     const newContent = { ...cmsContent, [field]: value };
@@ -160,11 +154,6 @@ export function Navbar() {
               <Globe className="h-4 w-4" />
               <span>{mounted ? (activeLang === "en" ? "中文" : "EN") : "中文"}</span>
             </button>
-          )}
-          {mounted && (
-            <Button size="sm" className="bg-primary hover:bg-primary/90 text-white hidden sm:flex">
-              {ctaText}
-            </Button>
           )}
         </div>
       </div>
