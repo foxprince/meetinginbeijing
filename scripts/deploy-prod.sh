@@ -26,6 +26,9 @@ REMOTE_DOMAIN=${REMOTE_DOMAIN:-jane.ydd-club.com}
 REMOTE_PORT=${REMOTE_PORT:-3003}
 REMOTE_USER=${REMOTE_APP_USER:-ubuntu}
 REMOTE_GROUP=${REMOTE_APP_GROUP:-ubuntu}
+REMOTE_GIT_URL=${REMOTE_GIT_URL:-https://gitee.com/foxprince/meetinginbeijing.git}
+DEPLOY_GIT_USERNAME=${DEPLOY_GIT_USERNAME:-}
+DEPLOY_GIT_PASSWORD=${DEPLOY_GIT_PASSWORD:-}
 
 if [ ! -x "$REMOTE_SSH" ]; then
   echo "找不到远程登录脚本 $REMOTE_SSH (或不可执行)"
@@ -44,7 +47,17 @@ fi
 git push origin "$BRANCH"
 
 echo "开始远程部署..."
-$REMOTE_SSH "bash -s" "$BRANCH" "$REMOTE_SERVICE_NAME" "$REMOTE_PORT" "$REMOTE_DOMAIN" "$REMOTE_REPO_DIR" "$REMOTE_USER" "$REMOTE_GROUP" <<'EOF'
+$REMOTE_SSH "bash -s" \
+  "$BRANCH" \
+  "$REMOTE_SERVICE_NAME" \
+  "$REMOTE_PORT" \
+  "$REMOTE_DOMAIN" \
+  "$REMOTE_REPO_DIR" \
+  "$REMOTE_USER" \
+  "$REMOTE_GROUP" \
+  "$REMOTE_GIT_URL" \
+  "$DEPLOY_GIT_USERNAME" \
+  "$DEPLOY_GIT_PASSWORD" <<'EOF'
 
 set -euo pipefail
 
@@ -55,6 +68,9 @@ DOMAIN="$4"
 APP_DIR="$5"
 APP_USER="$6"
 APP_GROUP="$7"
+REMOTE_URL="$8"
+GIT_USERNAME="${9:-}"
+GIT_PASSWORD="${10:-}"
 NODE_ENV=production
 PNPM_HOME="${HOME}/.local/share/pnpm"
 export PNPM_HOME
@@ -75,6 +91,31 @@ if ! command -v pnpm >/dev/null 2>&1; then
 fi
 
 cd "$APP_DIR"
+git remote set-url origin "$REMOTE_URL"
+
+if [ -n "$GIT_USERNAME" ] && [ -n "$GIT_PASSWORD" ]; then
+  if ! command -v python3 >/dev/null 2>&1; then
+    echo "缺少 python3，无法对凭据进行 URL 编码" >&2
+    exit 1
+  fi
+
+  urlencode() {
+    python3 - <<'PY' "$1"
+import sys
+from urllib.parse import quote
+print(quote(sys.argv[1], safe=''))
+PY
+  }
+
+  ENCODED_USER=$(urlencode "$GIT_USERNAME")
+  ENCODED_PASS=$(urlencode "$GIT_PASSWORD")
+  AUTH_URL="https://${ENCODED_USER}:${ENCODED_PASS}@${REMOTE_URL#https://}"
+
+  git config credential.helper store
+  printf '%s\n' "$AUTH_URL" > "$HOME/.git-credentials"
+  chmod 600 "$HOME/.git-credentials"
+fi
+
 git fetch origin "$BRANCH"
 git checkout "$BRANCH"
 git reset --hard origin/"$BRANCH"
