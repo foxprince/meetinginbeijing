@@ -99,6 +99,10 @@ ensure_swap() {
     return 0
   fi
 
+  if [ -f /swapfile ]; then
+    sudo rm -f /swapfile || true
+  fi
+
   if ! command -v free >/dev/null 2>&1; then
     return 0
   fi
@@ -112,12 +116,40 @@ ensure_swap() {
     return 0
   fi
 
-  echo "检测到内存较小(${mem_mb}MB)，创建 4G swap 避免 OOM"
+  echo "检测到内存较小(${mem_mb}MB)，尝试创建 swap 避免 OOM"
+
+  if command -v df >/dev/null 2>&1; then
+    avail_mb=$(df -Pm / | awk 'NR==2 {print $4}')
+  else
+    avail_mb=""
+  fi
+
+  echo "清理可再生缓存与依赖，释放磁盘空间"
+  sudo rm -rf "$APP_DIR/web/.next" "$APP_DIR/web/.turbo" \
+    "$APP_DIR/web/node_modules/.cache" >/dev/null 2>&1 || true
+  sudo rm -rf "$APP_DIR/web/node_modules" >/dev/null 2>&1 || true
+
+  if command -v df >/dev/null 2>&1; then
+    avail_mb=$(df -Pm / | awk 'NR==2 {print $4}')
+  fi
+
+  swap_mb=2048
+  if [ -n "$avail_mb" ] && [ "$avail_mb" -lt 3000 ]; then
+    swap_mb=1024
+  fi
+
+  if [ -n "$avail_mb" ] && [ "$avail_mb" -lt $((swap_mb + 600)) ]; then
+    echo "磁盘空间不足：可用 ${avail_mb}MB，无法创建 ${swap_mb}MB swap。请先扩容磁盘或手动清理。" >&2
+    exit 1
+  fi
+
   if [ ! -f /swapfile ]; then
-    sudo fallocate -l 4G /swapfile || sudo dd if=/dev/zero of=/swapfile bs=1M count=4096
+    sudo fallocate -l "${swap_mb}M" /swapfile || sudo dd if=/dev/zero \
+      of=/swapfile bs=1M count="$swap_mb"
     sudo chmod 600 /swapfile
     sudo mkswap /swapfile
   fi
+
   sudo swapon /swapfile || true
 }
 
