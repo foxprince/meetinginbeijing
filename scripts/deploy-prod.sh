@@ -19,7 +19,7 @@ fi
 
 COMMIT_MESSAGE="$1"
 BRANCH=${DEPLOY_BRANCH:-master}
-REMOTE_SSH=${REMOTE_SSH_BIN:-$HOME/bin/toYddEcs}
+REMOTE_SSH=${REMOTE_SSH_BIN:-$HOME/bin/toAwsGlb}
 REMOTE_REPO_DIR=${REMOTE_REPO_DIR:-/home/app/git/meetinginbeijing}
 REMOTE_SERVICE_NAME=${REMOTE_SERVICE_NAME:-meetinginbeijing-web}
 REMOTE_DOMAIN=${REMOTE_DOMAIN:-jane.ydd-club.com}
