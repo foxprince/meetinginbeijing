@@ -94,6 +94,35 @@ ensure_node_toolchain() {
 
 ensure_node_toolchain
 
+ensure_swap() {
+  if sudo swapon --show | grep -q '^/'; then
+    return 0
+  fi
+
+  if ! command -v free >/dev/null 2>&1; then
+    return 0
+  fi
+
+  mem_mb=$(free -m | awk '/^Mem:/ {print $2}')
+  if [ -z "$mem_mb" ]; then
+    return 0
+  fi
+
+  if [ "$mem_mb" -ge 3500 ]; then
+    return 0
+  fi
+
+  echo "检测到内存较小(${mem_mb}MB)，创建 4G swap 避免 OOM"
+  if [ ! -f /swapfile ]; then
+    sudo fallocate -l 4G /swapfile || sudo dd if=/dev/zero of=/swapfile bs=1M count=4096
+    sudo chmod 600 /swapfile
+    sudo mkswap /swapfile
+  fi
+  sudo swapon /swapfile || true
+}
+
+ensure_swap
+
 if ! command -v pnpm >/dev/null 2>&1; then
   echo "pnpm 不存在，将尝试使用 corepack 安装"
   if command -v corepack >/dev/null 2>&1; then
@@ -137,6 +166,11 @@ fi
 git fetch origin "$BRANCH"
 git checkout "$BRANCH"
 git reset --hard origin/"$BRANCH"
+
+if [ -n "$GIT_USERNAME" ] && [ -n "$GIT_PASSWORD" ]; then
+  rm -f "$HOME/.git-credentials" || true
+  git config --unset credential.helper >/dev/null 2>&1 || true
+fi
 
 cd "$APP_DIR/web"
 pnpm config set registry https://registry.npmmirror.com
