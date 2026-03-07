@@ -20,12 +20,12 @@ fi
 COMMIT_MESSAGE="$1"
 BRANCH=${DEPLOY_BRANCH:-master}
 REMOTE_SSH=${REMOTE_SSH_BIN:-$HOME/bin/toAwsGlb}
-REMOTE_REPO_DIR=${REMOTE_REPO_DIR:-/home/app/git/meetinginbeijing}
+REMOTE_REPO_DIR=${REMOTE_REPO_DIR:-/home/ubuntu/meetinginbeijing}
 REMOTE_SERVICE_NAME=${REMOTE_SERVICE_NAME:-meetinginbeijing-web}
 REMOTE_DOMAIN=${REMOTE_DOMAIN:-jane.ydd-club.com}
 REMOTE_PORT=${REMOTE_PORT:-3003}
-REMOTE_USER=${REMOTE_APP_USER:-app}
-REMOTE_GROUP=${REMOTE_APP_GROUP:-app}
+REMOTE_USER=${REMOTE_APP_USER:-ubuntu}
+REMOTE_GROUP=${REMOTE_APP_GROUP:-ubuntu}
 
 if [ ! -x "$REMOTE_SSH" ]; then
   echo "找不到远程登录脚本 $REMOTE_SSH (或不可执行)"
@@ -56,7 +56,7 @@ APP_DIR="$5"
 APP_USER="$6"
 APP_GROUP="$7"
 NODE_ENV=production
-PNPM_HOME=/home/app/.local/share/pnpm
+PNPM_HOME="${HOME}/.local/share/pnpm"
 export PNPM_HOME
 export PATH="$PNPM_HOME:$PATH"
 
@@ -64,13 +64,17 @@ if ! command -v pnpm >/dev/null 2>&1; then
   echo "pnpm 不存在，将尝试使用 corepack 安装"
   if command -v corepack >/dev/null 2>&1; then
     corepack enable pnpm
+  elif command -v curl >/dev/null 2>&1; then
+    echo "使用官方安装脚本安装 pnpm"
+    curl -fsSL https://get.pnpm.io/install.sh | env PNPM_HOME="$PNPM_HOME" SHELL="$(command -v bash)" sh -
+    export PATH="$PNPM_HOME:$PATH"
   else
-    npm install -g pnpm
+    echo "无法安装 pnpm：缺少 corepack/curl" >&2
+    exit 1
   fi
 fi
 
 cd "$APP_DIR"
-git remote set-url origin git@gitee.com-jane:foxprince/meetinginbeijing.git 2>/dev/null || true
 git fetch origin "$BRANCH"
 git checkout "$BRANCH"
 git reset --hard origin/"$BRANCH"
