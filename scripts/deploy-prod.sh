@@ -76,6 +76,24 @@ PNPM_HOME="${HOME}/.local/share/pnpm"
 export PNPM_HOME
 export PATH="$PNPM_HOME:$PATH"
 
+ensure_node_toolchain() {
+  if command -v node >/dev/null 2>&1 && command -v npm >/dev/null 2>&1; then
+    return 0
+  fi
+
+  if ! command -v curl >/dev/null 2>&1; then
+    echo "缺少 curl，无法安装 node/npm" >&2
+    exit 1
+  fi
+
+  echo "安装 Node.js 18.x 与 npm"
+  curl -fsSL https://deb.nodesource.com/setup_18.x | sudo -E bash -
+  sudo apt-get update
+  sudo apt-get install -y nodejs
+}
+
+ensure_node_toolchain
+
 if ! command -v pnpm >/dev/null 2>&1; then
   echo "pnpm 不存在，将尝试使用 corepack 安装"
   if command -v corepack >/dev/null 2>&1; then
