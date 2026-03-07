@@ -78,7 +78,10 @@ export PATH="$PNPM_HOME:$PATH"
 
 ensure_node_toolchain() {
   if command -v node >/dev/null 2>&1 && command -v npm >/dev/null 2>&1; then
-    return 0
+    node_major=$(node -p 'process.versions.node.split(".")[0]' 2>/dev/null || echo "")
+    if [ -n "$node_major" ] && [ "$node_major" -ge 20 ]; then
+      return 0
+    fi
   fi
 
   if ! command -v curl >/dev/null 2>&1; then
@@ -86,8 +89,8 @@ ensure_node_toolchain() {
     exit 1
   fi
 
-  echo "安装 Node.js 18.x 与 npm"
-  curl -fsSL https://deb.nodesource.com/setup_18.x | sudo -E bash -
+  echo "安装/升级 Node.js 20.x 与 npm"
+  curl -fsSL https://deb.nodesource.com/setup_20.x | sudo -E bash -
   sudo apt-get update
   sudo apt-get install -y nodejs
 }
