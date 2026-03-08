@@ -2,7 +2,6 @@
 
 import React from "react";
 import { useLanguage } from "@/app/providers";
-import { Button } from "@/components/ui/button";
 import { useCmsSection } from "@/hooks/use-cms-section";
 import { EditableSection } from "@/components/cms/editable-section";
 import { EditableImage } from "@/components/cms/editable-image";
@@ -14,8 +13,6 @@ export function Hero() {
   const cmsFallback = {
     title: t.hero.title,
     subtitle: t.hero.subtitle,
-    primaryCTA: t.hero.primaryCTA,
-    secondaryCTA: t.hero.secondaryCTA,
     trustPoints: t.hero.trustPoints,
     badges: t.hero.badges,
     imageUrl: '',
@@ -30,8 +27,6 @@ export function Hero() {
 
   const title = typeof cmsContent.title === "string" ? cmsContent.title : cmsFallback.title;
   const subtitle = typeof cmsContent.subtitle === "string" ? cmsContent.subtitle : cmsFallback.subtitle;
-  const primaryCTA = typeof cmsContent.primaryCTA === "string" ? cmsContent.primaryCTA : cmsFallback.primaryCTA;
-  const secondaryCTA = typeof cmsContent.secondaryCTA === "string" ? cmsContent.secondaryCTA : cmsFallback.secondaryCTA;
   
   const trustPointsRaw = cmsContent.trustPoints;
   const trustPoints = Array.isArray(trustPointsRaw) 
@@ -96,14 +91,7 @@ export function Hero() {
             {subtitle}
           </p>
           
-          <div className="flex flex-col sm:flex-row gap-4 justify-center md:justify-start mb-10">
-            <Button size="lg" className="bg-primary hover:bg-primary/90 text-white px-8 py-6 text-lg rounded-full">
-              {primaryCTA}
-            </Button>
-            <Button size="lg" variant="outline" className="px-8 py-6 text-lg border-2 rounded-full">
-              {secondaryCTA}
-            </Button>
-          </div>
+          <div className="mb-10" />
 
           <div className="flex flex-wrap justify-center md:justify-start gap-6">
             {trustPoints.map((point, index) => (
