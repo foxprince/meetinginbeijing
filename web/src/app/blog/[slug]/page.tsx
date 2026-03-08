@@ -33,7 +33,17 @@ async function getBlogPost(slug: string, lang: string = 'en'): Promise<BlogPost 
     if (res.status === 404) {
       return null;
     }
-    throw new Error('Failed to fetch blog post');
+
+    let bodyText = '';
+    try {
+      bodyText = await res.text();
+    } catch {
+      bodyText = '';
+    }
+    const snippet = bodyText ? bodyText.slice(0, 800) : '';
+    throw new Error(
+      `Failed to fetch blog post: ${res.status} ${res.statusText}${snippet ? `\n${snippet}` : ''}`
+    );
   }
 
   return res.json();

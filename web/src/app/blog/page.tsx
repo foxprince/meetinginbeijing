@@ -48,7 +48,16 @@ async function getBlogPosts(lang: string = 'en', page: number = 1): Promise<Blog
   });
 
   if (!res.ok) {
-    throw new Error('Failed to fetch blog posts');
+    let bodyText = '';
+    try {
+      bodyText = await res.text();
+    } catch {
+      bodyText = '';
+    }
+    const snippet = bodyText ? bodyText.slice(0, 800) : '';
+    throw new Error(
+      `Failed to fetch blog posts: ${res.status} ${res.statusText}${snippet ? `\n${snippet}` : ''}`
+    );
   }
 
   return res.json();
