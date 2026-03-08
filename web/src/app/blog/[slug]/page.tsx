@@ -6,6 +6,7 @@ import { Navbar } from '@/components/navbar';
 import { Footer } from '@/components/sections/footer-faq-cta';
 import { Button } from '@/components/ui/button';
 import { isOssPublicImageUrl, toDisplayImageUrl } from '@/lib/image';
+import { getServerBaseUrl } from '@/lib/server-base-url';
 import { Calendar, ArrowLeft, User, Share2 } from 'lucide-react';
 
 interface BlogPost {
@@ -23,10 +24,7 @@ interface BlogPost {
 }
 
 async function getBlogPost(slug: string, lang: string = 'en'): Promise<BlogPost | null> {
-  const baseUrl =
-    process.env.NEXT_PUBLIC_BASE_URL ||
-    process.env.INTERNAL_BASE_URL ||
-    'http://127.0.0.1:3003';
+  const baseUrl = await getServerBaseUrl();
   const res = await fetch(`${baseUrl}/api/blog/${slug}?lang=${lang}`, {
     next: { revalidate: 60 },
   });

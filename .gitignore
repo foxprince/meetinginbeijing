@@ -1,0 +1,4 @@
+.env
+.env.*
+web/.env
+web/env.visiable

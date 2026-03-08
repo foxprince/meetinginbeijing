@@ -6,6 +6,7 @@ import { Navbar } from '@/components/navbar';
 import { Footer } from '@/components/sections/footer-faq-cta';
 import { Button } from '@/components/ui/button';
 import { isOssPublicImageUrl, toDisplayImageUrl } from '@/lib/image';
+import { getServerBaseUrl } from '@/lib/server-base-url';
 import { Calendar, ArrowRight, User } from 'lucide-react';
 
 export const metadata: Metadata = {
@@ -35,10 +36,7 @@ interface BlogListResponse {
 }
 
 async function getBlogPosts(lang: string = 'en', page: number = 1): Promise<BlogListResponse> {
-  const baseUrl =
-    process.env.NEXT_PUBLIC_BASE_URL ||
-    process.env.INTERNAL_BASE_URL ||
-    'http://127.0.0.1:3003';
+  const baseUrl = await getServerBaseUrl();
   const query = new URLSearchParams({
     lang,
     status: 'published',
