@@ -12,6 +12,64 @@ export async function GET(request: NextRequest) {
     const status = searchParams.get('status') || 'published';
     const lang = searchParams.get('lang') || 'en';
 
+    if (status === 'all') {
+      const offset = (page - 1) * pageSize;
+      const client = await getDbClient();
+
+      try {
+        const postsResult = await client.query<{
+          id: number;
+          slug: string;
+          title_en: string;
+          title_zh: string;
+          excerpt_en: string | null;
+          excerpt_zh: string | null;
+          cover_image: string | null;
+          author: string;
+          status: string;
+          published_at: string | null;
+          created_at: string;
+          updated_at: string;
+        }>(
+          `SELECT
+            id,
+            slug,
+            title_en,
+            title_zh,
+            excerpt_en,
+            excerpt_zh,
+            cover_image,
+            author,
+            status,
+            published_at,
+            created_at,
+            updated_at
+          FROM blog_posts
+          ORDER BY created_at DESC
+          LIMIT $1 OFFSET $2`,
+          [pageSize, offset]
+        );
+
+        const countResult = await client.query<{ total: string }>(
+          'SELECT COUNT(*) as total FROM blog_posts'
+        );
+
+        const total = parseInt(countResult.rows[0]?.total ?? '0', 10);
+        const totalPages = Math.ceil(total / pageSize);
+
+        return NextResponse.json({
+          posts: postsResult.rows,
+          total,
+          page,
+          pageSize,
+          totalPages,
+          lang,
+        });
+      } finally {
+        client.release();
+      }
+    }
+
     const result = await fetch_blog_posts({
       page,
       page_size: pageSize,

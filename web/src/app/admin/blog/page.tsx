@@ -293,11 +293,18 @@ export default function AdminBlogPage() {
     );
   };
 
+  const normalizeSearchText = (value: unknown) => {
+    if (typeof value !== 'string') {
+      return '';
+    }
+    return value.toLowerCase();
+  };
+
   const filteredPosts = posts.filter(
     (post) =>
-      post.title_en.toLowerCase().includes(searchQuery.toLowerCase()) ||
-      post.title_zh.toLowerCase().includes(searchQuery.toLowerCase()) ||
-      post.slug.toLowerCase().includes(searchQuery.toLowerCase())
+      normalizeSearchText(post.title_en).includes(searchQuery.toLowerCase()) ||
+      normalizeSearchText(post.title_zh).includes(searchQuery.toLowerCase()) ||
+      normalizeSearchText(post.slug).includes(searchQuery.toLowerCase())
   );
 
   return (
