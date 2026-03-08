@@ -31,9 +31,6 @@ if (!connectionString) {
   throw new Error('POSTGRES_URL is not set');
 }
 
-// 允许自签名证书连接数据库
-process.env.NODE_TLS_REJECT_UNAUTHORIZED = '0';
-
 // 解析连接字符串，正确处理 URL 编码的密码
 type PgPoolConfig = ConstructorParameters<typeof Pool>[0];
 
