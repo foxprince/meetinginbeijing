@@ -2,6 +2,7 @@ import { Metadata } from 'next';
 import Link from 'next/link';
 import Image from 'next/image';
 import { Suspense } from 'react';
+import { headers } from 'next/headers';
 import { Navbar } from '@/components/navbar';
 import { Footer } from '@/components/sections/footer-faq-cta';
 import { Button } from '@/components/ui/button';
@@ -37,6 +38,9 @@ interface BlogListResponse {
 
 async function getBlogPosts(lang: string = 'en', page: number = 1): Promise<BlogListResponse> {
   const baseUrl = await getServerBaseUrl();
+  const h = await headers();
+  const cookie = h.get('cookie');
+  const authorization = h.get('authorization');
   const query = new URLSearchParams({
     lang,
     status: 'published',
@@ -45,6 +49,10 @@ async function getBlogPosts(lang: string = 'en', page: number = 1): Promise<Blog
   });
   const res = await fetch(`${baseUrl}/api/blog?${query.toString()}`, {
     cache: 'no-store',
+    headers: {
+      ...(cookie ? { cookie } : {}),
+      ...(authorization ? { authorization } : {}),
+    },
   });
 
   if (!res.ok) {

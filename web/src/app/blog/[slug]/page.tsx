@@ -2,6 +2,7 @@ import { Metadata } from 'next';
 import Link from 'next/link';
 import Image from 'next/image';
 import { notFound } from 'next/navigation';
+import { headers } from 'next/headers';
 import { Navbar } from '@/components/navbar';
 import { Footer } from '@/components/sections/footer-faq-cta';
 import { Button } from '@/components/ui/button';
@@ -25,8 +26,15 @@ interface BlogPost {
 
 async function getBlogPost(slug: string, lang: string = 'en'): Promise<BlogPost | null> {
   const baseUrl = await getServerBaseUrl();
+  const h = await headers();
+  const cookie = h.get('cookie');
+  const authorization = h.get('authorization');
   const res = await fetch(`${baseUrl}/api/blog/${slug}?lang=${lang}`, {
     next: { revalidate: 60 },
+    headers: {
+      ...(cookie ? { cookie } : {}),
+      ...(authorization ? { authorization } : {}),
+    },
   });
 
   if (!res.ok) {
