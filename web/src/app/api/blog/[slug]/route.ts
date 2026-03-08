@@ -1,4 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server';
+import { fetch_blog_post_by_slug } from '@/lib/blog';
 import { getDbClient } from '@/lib/db';
 import { UpdateBlogPostRequest } from '@/types/blog';
 
@@ -13,39 +14,17 @@ export async function GET(
     const lang = searchParams.get('lang') || 'en';
     const includeDraft = searchParams.get('includeDraft') === 'true';
 
-    const client = await getDbClient();
+    const post = await fetch_blog_post_by_slug({
+      slug,
+      lang,
+      include_draft: includeDraft,
+    });
 
-    const tableSuffix = lang === 'zh' ? 'zh' : 'en';
-    const baseQuery = `
-        SELECT 
-          id,
-          slug,
-          title_${tableSuffix} as title,
-          content_${tableSuffix} as content,
-          excerpt_${tableSuffix} as excerpt,
-          cover_image,
-          author,
-          status,
-          published_at,
-          created_at,
-          updated_at,
-          meta_title_${tableSuffix} as meta_title,
-          meta_description_${tableSuffix} as meta_description
-        FROM blog_posts
-        WHERE slug = $1`;
-
-    const queryText = includeDraft ? baseQuery : `${baseQuery} AND status = 'published'`;
-    const result = await client.query(queryText, [slug]);
-    client.release();
-
-    if (result.rows.length === 0) {
-      return NextResponse.json(
-        { error: 'Blog post not found' },
-        { status: 404 }
-      );
+    if (!post) {
+      return NextResponse.json({ error: 'Blog post not found' }, { status: 404 });
     }
 
-    return NextResponse.json(result.rows[0]);
+    return NextResponse.json(post);
   } catch (error) {
     console.error('Error fetching blog post:', error);
     return NextResponse.json(
@@ -67,7 +46,11 @@ export async function PUT(
     const client = await getDbClient();
 
     // 检查文章是否存在
-    const existingResult = await client.query('SELECT id, status, published_at FROM blog_posts WHERE slug = $1', [slug]);
+    const existingResult = await client.query<{
+      id: number;
+      status: string;
+      published_at: string | null;
+    }>('SELECT id, status, published_at FROM blog_posts WHERE slug = $1', [slug]);
 
     if (existingResult.rows.length === 0) {
       client.release();
@@ -157,7 +140,7 @@ export async function PUT(
       RETURNING *
     `;
 
-    const result = await client.query(query, values);
+    const result = await client.query<Record<string, unknown>>(query, values);
     client.release();
 
     return NextResponse.json(result.rows[0]);
@@ -180,7 +163,10 @@ export async function DELETE(
 
     const client = await getDbClient();
 
-    const result = await client.query('DELETE FROM blog_posts WHERE slug = $1 RETURNING id', [slug]);
+    const result = await client.query<{ id: number }>(
+      'DELETE FROM blog_posts WHERE slug = $1 RETURNING id',
+      [slug]
+    );
     client.release();
 
     if (result.rows.length === 0) {

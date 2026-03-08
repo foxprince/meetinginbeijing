@@ -17,7 +17,7 @@ export async function GET(
     }
 
     const client = await getDbClient();
-    const result = await client.query(
+    const result = await client.query<Record<string, unknown>>(
       `SELECT
         id,
         slug,

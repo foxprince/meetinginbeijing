@@ -1,4 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server';
+import { fetch_blog_posts } from '@/lib/blog';
 import { getDbClient } from '@/lib/db';
 import { CreateBlogPostRequest, generateSlug } from '@/types/blog';
 
@@ -11,74 +12,14 @@ export async function GET(request: NextRequest) {
     const status = searchParams.get('status') || 'published';
     const lang = searchParams.get('lang') || 'en';
 
-    const offset = (page - 1) * pageSize;
-
-    const client = await getDbClient();
-
-    // 获取文章列表 - 如果 status 为 'all'，则不限制状态
-    let postsResult;
-    let countResult;
-
-    if (status === 'all') {
-      postsResult = await client.query(
-        `SELECT 
-          id,
-          slug,
-          title_en,
-          title_zh,
-          excerpt_en,
-          excerpt_zh,
-          cover_image,
-          author,
-          status,
-          published_at,
-          created_at,
-          updated_at
-        FROM blog_posts
-        ORDER BY created_at DESC
-        LIMIT $1 OFFSET $2`,
-        [pageSize, offset]
-      );
-
-      countResult = await client.query('SELECT COUNT(*) as total FROM blog_posts');
-    } else {
-      const titleColumn = lang === 'zh' ? 'title_zh' : 'title_en';
-      const excerptColumn = lang === 'zh' ? 'excerpt_zh' : 'excerpt_en';
-
-      postsResult = await client.query(
-        `SELECT 
-          id,
-          slug,
-          ${titleColumn} as title,
-          ${excerptColumn} as excerpt,
-          cover_image,
-          author,
-          status,
-          published_at,
-          created_at,
-          updated_at
-        FROM blog_posts
-        WHERE status = $1
-        ORDER BY published_at DESC NULLS LAST, created_at DESC
-        LIMIT $2 OFFSET $3`,
-        [status, pageSize, offset]
-      );
-
-      countResult = await client.query('SELECT COUNT(*) as total FROM blog_posts WHERE status = $1', [status]);
-    }
-
-    client.release();
-
-    const total = parseInt(countResult.rows[0].total);
-    const totalPages = Math.ceil(total / pageSize);
-
-    return NextResponse.json({
-      posts: postsResult.rows,
-      total,
+    const result = await fetch_blog_posts({
       page,
-      pageSize,
-      totalPages,
+      page_size: pageSize,
+      status: status === 'all' ? 'all' : (status as 'draft' | 'published' | 'archived'),
+      lang,
     });
+
+    return NextResponse.json(result);
   } catch (error) {
     console.error('Error fetching blog posts:', error);
     return NextResponse.json(
@@ -107,7 +48,10 @@ export async function POST(request: NextRequest) {
     const client = await getDbClient();
 
     // 检查 slug 是否已存在
-    const existingResult = await client.query('SELECT id FROM blog_posts WHERE slug = $1', [slug]);
+    const existingResult = await client.query<{ id: number }>(
+      'SELECT id FROM blog_posts WHERE slug = $1',
+      [slug]
+    );
 
     if (existingResult.rows.length > 0) {
       client.release();
@@ -125,7 +69,7 @@ export async function POST(request: NextRequest) {
         : null;
 
     // 插入新文章
-    const result = await client.query(
+    const result = await client.query<Record<string, unknown>>(
       `INSERT INTO blog_posts (
         slug,
         title_en,

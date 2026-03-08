@@ -2,12 +2,11 @@ import { Metadata } from 'next';
 import Link from 'next/link';
 import Image from 'next/image';
 import { notFound } from 'next/navigation';
-import { headers } from 'next/headers';
 import { Navbar } from '@/components/navbar';
 import { Footer } from '@/components/sections/footer-faq-cta';
 import { Button } from '@/components/ui/button';
 import { isOssPublicImageUrl, toDisplayImageUrl } from '@/lib/image';
-import { getServerBaseUrl } from '@/lib/server-base-url';
+import { fetch_blog_post_by_slug } from '@/lib/blog';
 import { Calendar, ArrowLeft, User, Share2 } from 'lucide-react';
 
 interface BlogPost {
@@ -18,43 +17,17 @@ interface BlogPost {
   excerpt: string;
   cover_image: string | null;
   author: string;
-  published_at: string;
+  published_at: string | null;
   created_at: string;
-  meta_title?: string;
-  meta_description?: string;
+  meta_title?: string | null;
+  meta_description?: string | null;
 }
 
 async function getBlogPost(slug: string, lang: string = 'en'): Promise<BlogPost | null> {
-  const baseUrl = await getServerBaseUrl();
-  const h = await headers();
-  const cookie = h.get('cookie');
-  const authorization = h.get('authorization');
-  const res = await fetch(`${baseUrl}/api/blog/${slug}?lang=${lang}`, {
-    next: { revalidate: 60 },
-    headers: {
-      ...(cookie ? { cookie } : {}),
-      ...(authorization ? { authorization } : {}),
-    },
+  return fetch_blog_post_by_slug({
+    slug,
+    lang,
   });
-
-  if (!res.ok) {
-    if (res.status === 404) {
-      return null;
-    }
-
-    let bodyText = '';
-    try {
-      bodyText = await res.text();
-    } catch {
-      bodyText = '';
-    }
-    const snippet = bodyText ? bodyText.slice(0, 800) : '';
-    throw new Error(
-      `Failed to fetch blog post: ${res.status} ${res.statusText}${snippet ? `\n${snippet}` : ''}`
-    );
-  }
-
-  return res.json();
 }
 
 function formatDate(dateString: string, lang: string = 'en'): string {

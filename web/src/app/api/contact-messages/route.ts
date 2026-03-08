@@ -59,7 +59,7 @@ export async function POST(request: NextRequest) {
     const client = await getDbClient();
 
     try {
-      const result = await client.query(
+      const result = await client.query<{ id: number; created_at: string }>(
         `INSERT INTO contact_messages (
           name,
           country,
@@ -80,7 +80,7 @@ export async function POST(request: NextRequest) {
         ]
       );
 
-      const createdAt = result.rows[0].created_at as string;
+      const createdAt = result.rows[0].created_at;
       let smsNotified = true;
       let smsError = "";
 

@@ -82,7 +82,7 @@ export async function listCmsSections(): Promise<CmsSectionRow[]> {
   const client = await getDbClient();
 
   try {
-    const result = await client.query(
+    const result = await client.query<Record<string, unknown>>(
       `SELECT
         section_key,
         draft_content_en,
@@ -115,7 +115,7 @@ export async function updateCmsSectionDraft(
 
   try {
     const column = locale === 'zh' ? 'draft_content_zh' : 'draft_content_en';
-    const result = await client.query(
+    const result = await client.query<Record<string, unknown>>(
       `UPDATE cms_sections
        SET ${column} = $2::jsonb,
            status = 'draft',
@@ -151,7 +151,7 @@ export async function publishCmsSection(
   const client = await getDbClient();
 
   try {
-    const result = await client.query(
+    const result = await client.query<Record<string, unknown>>(
       `UPDATE cms_sections
        SET published_content_en = draft_content_en,
            published_content_zh = draft_content_zh,
@@ -191,7 +191,7 @@ export async function getPublishedCmsSection(
 
   try {
     const column = locale === 'zh' ? 'published_content_zh' : 'published_content_en';
-    const result = await client.query(
+    const result = await client.query<{ section_content: unknown }>(
       `SELECT ${column} AS section_content
        FROM cms_sections
        WHERE section_key = $1

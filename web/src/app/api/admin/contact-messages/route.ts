@@ -46,7 +46,7 @@ export async function GET(request: NextRequest) {
         ? `WHERE ${conditions.join(" AND ")}`
         : "";
 
-      const result = await client.query(
+      const result = await client.query<Record<string, unknown>>(
         `SELECT
           id,
           name,

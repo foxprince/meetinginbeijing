@@ -2,12 +2,11 @@ import { Metadata } from 'next';
 import Link from 'next/link';
 import Image from 'next/image';
 import { Suspense } from 'react';
-import { headers } from 'next/headers';
 import { Navbar } from '@/components/navbar';
 import { Footer } from '@/components/sections/footer-faq-cta';
 import { Button } from '@/components/ui/button';
 import { isOssPublicImageUrl, toDisplayImageUrl } from '@/lib/image';
-import { getServerBaseUrl } from '@/lib/server-base-url';
+import { fetch_blog_posts } from '@/lib/blog';
 import { Calendar, ArrowRight, User } from 'lucide-react';
 
 export const metadata: Metadata = {
@@ -24,7 +23,7 @@ interface BlogPost {
   excerpt: string;
   cover_image: string | null;
   author: string;
-  published_at: string;
+  published_at: string | null;
   created_at: string;
 }
 
@@ -37,38 +36,12 @@ interface BlogListResponse {
 }
 
 async function getBlogPosts(lang: string = 'en', page: number = 1): Promise<BlogListResponse> {
-  const baseUrl = await getServerBaseUrl();
-  const h = await headers();
-  const cookie = h.get('cookie');
-  const authorization = h.get('authorization');
-  const query = new URLSearchParams({
+  return fetch_blog_posts({
     lang,
     status: 'published',
-    page: String(page),
-    pageSize: '12',
+    page,
+    page_size: 12,
   });
-  const res = await fetch(`${baseUrl}/api/blog?${query.toString()}`, {
-    cache: 'no-store',
-    headers: {
-      ...(cookie ? { cookie } : {}),
-      ...(authorization ? { authorization } : {}),
-    },
-  });
-
-  if (!res.ok) {
-    let bodyText = '';
-    try {
-      bodyText = await res.text();
-    } catch {
-      bodyText = '';
-    }
-    const snippet = bodyText ? bodyText.slice(0, 800) : '';
-    throw new Error(
-      `Failed to fetch blog posts: ${res.status} ${res.statusText}${snippet ? `\n${snippet}` : ''}`
-    );
-  }
-
-  return res.json();
 }
 
 function formatDate(dateString: string, lang: string = 'en'): string {

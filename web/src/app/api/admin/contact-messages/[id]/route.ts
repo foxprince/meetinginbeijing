@@ -75,7 +75,7 @@ export async function PATCH(
 
       values.push(messageId);
 
-      const result = await client.query(
+      const result = await client.query<Record<string, unknown>>(
         `UPDATE contact_messages
          SET ${fields.join(", ")}
          WHERE id = $${values.length}
@@ -130,7 +130,7 @@ export async function DELETE(
     const client = await getDbClient();
 
     try {
-      const result = await client.query(
+      const result = await client.query<{ id: number }>(
         "DELETE FROM contact_messages WHERE id = $1 RETURNING id",
         [messageId]
       );

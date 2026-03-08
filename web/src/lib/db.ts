@@ -69,8 +69,16 @@ const pool = new Pool(poolConfig);
 
 export const getDbPool = () => pool;
 
-export async function getDbClient() {
-  return pool.connect();
+export type DbClient = {
+  query: <T = unknown>(
+    text: string,
+    values?: unknown[]
+  ) => Promise<{ rows: T[] }>;
+  release: () => void;
+};
+
+export async function getDbClient(): Promise<DbClient> {
+  return pool.connect() as unknown as DbClient;
 }
 
 export async function ensureContactMessagesTable(): Promise<void> {
