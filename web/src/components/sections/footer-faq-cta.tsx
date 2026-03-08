@@ -7,7 +7,6 @@ import { SectionWrapper } from "@/components/section-wrapper";
 import { useCmsSection } from "@/hooks/use-cms-section";
 import { EditableSection } from "@/components/cms/editable-section";
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/components/ui/accordion";
-import { Button } from "@/components/ui/button";
 import Image from "next/image";
 import { CheckCircle2, MessageSquare, Mail, Phone } from "lucide-react";
 
@@ -153,8 +152,6 @@ export function FinalCTA() {
 
   const title = typeof cmsContent.title === "string" ? cmsContent.title : cmsFallback.title;
   const subtitle = typeof cmsContent.subtitle === "string" ? cmsContent.subtitle : cmsFallback.subtitle;
-  const primary = typeof cmsContent.primary === "string" ? cmsContent.primary : cmsFallback.primary;
-  const secondary = typeof cmsContent.secondary === "string" ? cmsContent.secondary : cmsFallback.secondary;
 
   return (
     <SectionWrapper className="bg-primary text-white text-center py-20">
@@ -167,14 +164,6 @@ export function FinalCTA() {
       >
       <h2 className="text-3xl md:text-5xl font-bold mb-6">{title}</h2>
       <p className="text-xl text-primary-foreground/80 mb-10 max-w-2xl mx-auto">{subtitle}</p>
-      <div className="flex flex-col sm:flex-row gap-4 justify-center">
-        <Button size="lg" className="bg-accent hover:bg-accent/90 text-white font-bold px-10 py-7 text-lg rounded-full">
-          {primary}
-        </Button>
-        <Button size="lg" variant="outline" className="border-2 border-white text-white hover:bg-white/10 px-10 py-7 text-lg rounded-full">
-          {secondary}
-        </Button>
-      </div>
       </EditableSection>
     </SectionWrapper>
   );
