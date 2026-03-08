@@ -23,9 +23,18 @@ interface BlogPost {
   meta_description?: string | null;
 }
 
+function normalizeSlug(rawSlug: string): string {
+  try {
+    return decodeURIComponent(rawSlug);
+  } catch {
+    return rawSlug;
+  }
+}
+
 async function getBlogPost(slug: string, lang: string = 'en'): Promise<BlogPost | null> {
+  const normalizedSlug = normalizeSlug(slug);
   return fetch_blog_post_by_slug({
-    slug,
+    slug: normalizedSlug,
     lang,
   });
 }
